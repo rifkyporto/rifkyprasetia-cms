@@ -2,7 +2,7 @@ import React from 'react'
 import { createClient } from "@/utils/supabase/server";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-
+import { Toaster } from "@/components/ui/toast"
 import Navbar from './Navbar';
 import Footer from './Footer';
 
@@ -26,6 +26,7 @@ const Layout = async ({ children, className }: LayoutProps ) => {
       <div className='mx-10'>
         {children}
       </div>
+      <Toaster />
       <Footer />
     </div>
   )

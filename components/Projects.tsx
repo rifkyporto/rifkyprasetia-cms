@@ -10,7 +10,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import Link from 'next/link';
 import { Input } from "@/components/ui/input"
+import ModalCreateProject from './modals/ModalCreateProject';
 const Projects = () => {
   return (
     <>
@@ -23,7 +25,7 @@ const Projects = () => {
           <div className="flex gap-3">
             <Select>
               <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Select category" />
+                <SelectValue placeholder="Filter by category" />
               </SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All</SelectItem>
@@ -34,15 +36,32 @@ const Projects = () => {
                 <SelectItem value="others">Others</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant={"outline"}>Add Project</Button>
+            <ModalCreateProject />
           </div>
         </div>
-        
-        
         <hr className="w-full" />
       </div>
       <Input className="mb-5 focus:border-0" placeholder="Search project by name" />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-3">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-3 gap-y-5">
+        <Link href="/projects/jeder" className="flex flex-col gap-2 w-full">
+          <img
+            src="https://static.wixstatic.com/media/d9f26d_bfde3c5382e841e290e1026b3784e532~mv2.jpg/v1/fit/w_972,h_548,q_90/d9f26d_bfde3c5382e841e290e1026b3784e532~mv2.webp"
+            alt="Vercel Logo"
+            // fill
+            // className={`dark:invert ${isOverlayInspect && "grayscale"} transition-all duration-500 w-[100%] h-auto`}
+            // width={320}
+            // height={100}
+            // priority
+            className="w-full rounded-lg"
+          />
+          <div className="flex justify-between items-start">
+            <div className="flex flex-col pl-1">
+              <p className="text-xl">#Jembatan by Chandra Liow</p>
+              <p className="text-gray-500 text-sm font-light">Short Film, July 2024</p>
+            </div>
+            <Icon icon="mage:dots" className="text-xl mt-1" />
+          </div>
+        </Link>
         <div className="flex flex-col gap-2 w-full">
           <img
             src="https://static.wixstatic.com/media/d9f26d_bfde3c5382e841e290e1026b3784e532~mv2.jpg/v1/fit/w_972,h_548,q_90/d9f26d_bfde3c5382e841e290e1026b3784e532~mv2.webp"
@@ -55,9 +74,9 @@ const Projects = () => {
             className="w-full rounded-lg"
           />
           <div className="flex justify-between items-start">
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col pl-1">
               <p className="text-xl">#Jembatan by Chandra Liow</p>
-              <p className="text-gray-500">Short Film, July 2024</p>
+              <p className="text-gray-500 text-sm font-light">Short Film, July 2024</p>
             </div>
             <Icon icon="mage:dots" className="text-xl mt-1" />
           </div>
@@ -74,9 +93,9 @@ const Projects = () => {
             className="w-full rounded-lg"
           />
           <div className="flex justify-between items-start">
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col pl-1">
               <p className="text-xl">#Jembatan by Chandra Liow</p>
-              <p className="text-gray-500">Short Film, July 2024</p>
+              <p className="text-gray-500 text-sm font-light">Short Film, July 2024</p>
             </div>
             <Icon icon="mage:dots" className="text-xl mt-1" />
           </div>
@@ -93,9 +112,9 @@ const Projects = () => {
             className="w-full rounded-lg"
           />
           <div className="flex justify-between items-start">
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col pl-1">
               <p className="text-xl">#Jembatan by Chandra Liow</p>
-              <p className="text-gray-500">Short Film, July 2024</p>
+              <p className="text-gray-500 text-sm font-light">Short Film, July 2024</p>
             </div>
             <Icon icon="mage:dots" className="text-xl mt-1" />
           </div>
@@ -112,28 +131,9 @@ const Projects = () => {
             className="w-full rounded-lg"
           />
           <div className="flex justify-between items-start">
-            <div className="flex flex-col gap-1">
+            <div className="flex flex-col pl-1">
               <p className="text-xl">#Jembatan by Chandra Liow</p>
-              <p className="text-gray-500">Short Film, July 2024</p>
-            </div>
-            <Icon icon="mage:dots" className="text-xl mt-1" />
-          </div>
-        </div>
-        <div className="flex flex-col gap-2 w-full">
-          <img
-            src="https://static.wixstatic.com/media/d9f26d_bfde3c5382e841e290e1026b3784e532~mv2.jpg/v1/fit/w_972,h_548,q_90/d9f26d_bfde3c5382e841e290e1026b3784e532~mv2.webp"
-            alt="Vercel Logo"
-            // fill
-            // className={`dark:invert ${isOverlayInspect && "grayscale"} transition-all duration-500 w-[100%] h-auto`}
-            // width={320}
-            // height={100}
-            // priority
-            className="w-full rounded-lg"
-          />
-          <div className="flex justify-between items-start">
-            <div className="flex flex-col gap-1">
-              <p className="text-xl">#Jembatan by Chandra Liow</p>
-              <p className="text-gray-500">Short Film, July 2024</p>
+              <p className="text-gray-500 text-sm font-light">Short Film, July 2024</p>
             </div>
             <Icon icon="mage:dots" className="text-xl mt-1" />
           </div>
