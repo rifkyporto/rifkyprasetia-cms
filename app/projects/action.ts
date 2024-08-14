@@ -4,7 +4,6 @@ import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 
 export async function createProject(formData: FormData) {
-  const cookieStore = cookies();
   const supabase = createClient();
 
   const { data: { session } } = await supabase.auth.getSession();
@@ -23,6 +22,7 @@ export async function createProject(formData: FormData) {
   const month = formData.get('month') as string;
   const year = formData.get('year') as string;
   const linkTeaser = formData.get('linkTeaser') as string;
+  const coverImageUrl = formData.get('coverImageUrl') as string;
 
   const { data, error } = await supabase
     .from('projects')
@@ -33,7 +33,8 @@ export async function createProject(formData: FormData) {
       client_name: clientName,
       date_month_project: `${month} ${year}`,
       link_teaser: linkTeaser,
-      user_id: userId
+      user_id: userId,
+      cover_image_url: coverImageUrl
     });
 
   if (error) throw error;
