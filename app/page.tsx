@@ -10,7 +10,7 @@ import Projects from "@/components/Projects";
 import Categories from "@/components/Categories";
 import Socials from "@/components/Socials";
 
-export default async function Index() {
+export default async function Index({ searchParams }: { searchParams: { search?: string } }) {
   return (
     <Layout className="w-full flex flex-col gap-10 ">
 
@@ -22,7 +22,7 @@ export default async function Index() {
           <TabsTrigger value="socials">Socials</TabsTrigger>
         </TabsList>
         <TabsContent value="project">
-          <Projects />
+          <Projects searchParams={searchParams} />
         </TabsContent>
         <TabsContent value="category">
           <Categories />
