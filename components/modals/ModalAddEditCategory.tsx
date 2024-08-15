@@ -1,7 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from 'react'
-import { MONTH_LIST, YEAR_LIST } from '@/common/date-config';
+import { createClient } from "@/utils/supabase/client"
+import React, { ChangeEvent } from 'react'
+import { ErrorInputTag } from "@/composables/validation.types";
+import { CategoryDropdownType } from '@/composables/category.types';
+import { categoryAction } from '@/app/category/action';
 import {
   Dialog,
   DialogContent,
@@ -12,7 +15,7 @@ import {
   DialogFooter,
   DialogClose
 } from "@/components/ui/dialog"
-// import { MonthPicker, MonthInput } from 'react-lite-month-picker';
+import { useToast } from "@/components/ui/toast"
 import { Icon } from '@iconify/react';
 import { Button } from '../ui/button'
 import { Label } from '../ui/label';
@@ -20,25 +23,91 @@ import { Input } from '../ui/input';
 
 interface ModalAddEditCategoryType {
   isEdit?: boolean
+  data?: CategoryDropdownType
 }
-const ModalAddEditCategory: React.FC<ModalAddEditCategoryType> = ({ isEdit }) => {
+const ModalAddEditCategory: React.FC<ModalAddEditCategoryType> = ({ isEdit, data }) => {
+  const { toast } = useToast();
+  const [inputValue, setInputValue] = React.useState<string>(data?.slug || '');
+  const [errorFeedback, setErrorFeedback] = React.useState<ErrorInputTag[]>([]);
+  const [loadingSubmit, setLoadingSubmit] = React.useState<'loading' | 'idle'>('idle');
 
-  const [isMounted, setIsMounted] = useState(false);
-  const [selectedMonthData, setSelectedMonthData] = useState({
-    month: 9,
-    year: 2023,
-  });
+  async function handleSave (formData: FormData) {
+    try {
+      console.log("hhh")
+      setLoadingSubmit('loading');
+      const errors = [];
+      const closeButton = document.getElementById("close-modal-category");
+      const name = formData.get('name') as string;
 
+      if (!name) {
+        errors.push({ message: 'Name is required', id: 'name' });
+      }
 
-  const [isPickerOpen, setIsPickerOpen] = useState(false);
+      if (errors.length) {
+        console.log("error", errors)
+        setErrorFeedback(errors);
+        return
+      }
 
+      setErrorFeedback([]);
 
-  useEffect(() => {
-    setIsMounted(true); // Ensure component mounts on the client
-  }, []);
+      if (isEdit && data?.id) {
+        // Update existing category
+        formData.set('id', data?.id);
+        console.log("edit")
+        await categoryAction(formData);
+        toast({
+          title: "Success edit category",
+        })
 
-  // Return null if not mounted to avoid server-client mismatch
-  if (!isMounted) return null;
+        closeButton?.click();
+      } else {
+        await categoryAction(formData);
+        toast({
+          title: "Success create category",
+        })
+
+        closeButton?.click();
+      }
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error("Error message:", error.message);
+        toast({
+          variant: "destructive",
+          title: `Error create / edit category`,
+          description: error?.message
+        })
+      } else {
+        console.error("Unexpected error:", error);
+        toast({
+          variant: "destructive",
+          title: `Error create / edit category`,
+        })
+      }
+    } finally {
+      setLoadingSubmit('idle')
+    }
+  };
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    // Get the current value of the input
+    let value = e.target.value;
+
+    // Convert to lowercase, replace spaces with hyphens, and remove any characters that aren't lowercase letters or hyphens
+    // value = value
+    //   .toLowerCase()
+    //   .replace(/ /g, '-')        // Replace spaces with hyphens
+    //   .replace(/[^a-z-]/g, '');  // Remove any character that's not a lowercase letter or a hyphen
+
+    value = value
+      .toLowerCase()
+      .replace(/ /g, '-')          // Replace spaces with hyphens
+      .replace(/[^a-z0-9-]/g, ''); // Remove any character that's not a lowercase letter, number, or a hyphen
+
+    // Update the state with the modified value
+    setInputValue(value);
+  };
+
 
   return (
     <Dialog>
@@ -56,22 +125,37 @@ const ModalAddEditCategory: React.FC<ModalAddEditCategoryType> = ({ isEdit }) =>
           </DialogDescription> */}
         </DialogHeader>
         <hr />
-        <div className='flex flex-col gap-5'>
-          <Label className='flex flex-col gap-2'>
-            Category Name
-            <Input className='lg:max-w-2xl' placeholder='Enter your category name'/>
-          </Label>
-          <Label className='flex flex-col gap-2'>
-            Category Slug (auto-generated)
-            <Input className='lg:max-w-2xl' placeholder='Enter your slug name'/>
-          </Label>
-        </div>
-        <DialogFooter>
-          <DialogClose asChild>
-            <Button variant={'outline'}>Cancel</Button>
-          </DialogClose>
-          <Button>Save</Button>
-        </DialogFooter>
+        <form action={handleSave}>
+          <div className='flex flex-col gap-5'>
+            <Label className='flex flex-col gap-2'>
+              Category Name
+              <Input id="name" name="name" className='lg:max-w-2xl' placeholder='Enter your category name' defaultValue={data?.name}/>
+              {errorFeedback?.find((err) => err.id === 'name') && (
+                <small className="text-red-500">
+                  {errorFeedback.find((err) => err.id === "name")?.message }
+                </small>
+              )}
+            </Label>
+            <Label className='flex flex-col gap-2'>
+              Category Slug (auto-generated)
+              <Input id="slug" name="slug" onChange={handleInputChange} value={inputValue} className='lg:max-w-2xl' placeholder='Enter your slug name' defaultValue={data?.slug}/>
+              <small className="">
+                it will be auto-generated if this field is empty
+              </small>
+            </Label>
+          </div>
+          <DialogFooter>
+            <DialogClose asChild className='hidden'>
+              <Button id='close-modal-category'>close</Button>
+            </DialogClose>
+            <DialogClose asChild>
+              <Button variant={'outline'}>Cancel</Button>
+            </DialogClose>
+            <Button type="submit" disabled={loadingSubmit === 'loading'}>
+              {loadingSubmit === 'loading' ? 'Saving...' : 'Save'}
+            </Button>
+          </DialogFooter>
+        </form>
       </DialogContent>
     </Dialog>
   )

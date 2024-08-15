@@ -1,3 +1,5 @@
+"use server"
+import { createClient } from "@/utils/supabase/server"
 import React from 'react'
 import {
   Table,
@@ -9,12 +11,20 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { CategoryDropdownType } from "@/composables/category.types"
 import { Icon } from '@iconify/react'
 import { Button } from "@/components/ui/button"
 import ModalAddEditCategory from './modals/ModalAddEditCategory';
 
-const Categories = () => {
-  const categories = [
+const Categories = async () => {
+  const supabase = createClient();
+  const { data: categories, error } = await supabase
+    .from('category') // Adjust this to your table name
+    .select('*')
+    .eq("user_id", `${process.env.NEXT_PUBLIC_SUPABASE_USER_ID}`)
+
+  console.log({categories})
+  const categoriess = [
     {
       id: "XXXX",
       name: "Short Film",
@@ -65,23 +75,20 @@ const Categories = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {categories.map((invoice) => (
-            <TableRow key={invoice.id}>
-              <TableCell className="font-medium">{invoice.id}</TableCell>
-              <TableCell>{invoice.name}</TableCell>
-              <TableCell>{invoice.value}</TableCell>
+          {categories?.map((category) => (
+            <TableRow key={category.id}>
+              <TableCell className="font-medium">{category.id}</TableCell>
+              <TableCell>{category.name}</TableCell>
+              <TableCell>{category.slug}</TableCell>
               <TableCell>
-                <ModalAddEditCategory isEdit />
+                <ModalAddEditCategory
+                  isEdit
+                  data={category}
+                />
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
-        {/* <TableFooter>
-          <TableRow>
-            <TableCell colSpan={3}>Total</TableCell>
-            <TableCell className="text-right">$2,500.00</TableCell>
-          </TableRow>
-        </TableFooter> */}
       </Table>
     </>
   )
