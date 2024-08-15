@@ -26,7 +26,7 @@ const ButtonSidebar: React.FC<ButtonSidebar> = ({ queryType, title }) => {
         "justify-start text-black"
       )}
       onClick={() => {
-        router.push(`/projects/jeder?type=${queryType}`)
+        router.push(`?type=${queryType}`)
       }}
     >
       {title}
