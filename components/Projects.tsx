@@ -3,28 +3,21 @@ import { createClient } from "@/utils/supabase/server"
 import React from 'react'
 import { Button } from "@/components/ui/button"
 import { Icon } from "@iconify/react";
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import Link from 'next/link';
-import { Input } from "@/components/ui/input"
 import ModalCreateProject from './modals/ModalCreateProject';
 import SearchInput from "./SearchInputProject";
+import FilterCategoryDropdown from "./FilterCategoryDropdown";
 
-const Projects = async ({ searchParams }: { searchParams: { search?: string } }) => {
+const Projects = async ({ searchParams }: { searchParams: { search?: string, type?: string } }) => {
   const searchQuery = searchParams.search || "";
+  const typeQuery = searchParams.type || "";
+  console.log({typeQuery})
   const supabase = createClient();
   const { data: projects, error } = await supabase
     .from('projects') // Adjust this to your table name
     .select('*')
-    .ilike("title", `%${searchQuery}%`);
-
+    .ilike("title", `%${searchQuery}%`)
+    .ilike("category_id", `%${typeQuery}%`)
   console.log({projects})
   return (
     <>
@@ -35,33 +28,12 @@ const Projects = async ({ searchParams }: { searchParams: { search?: string } })
             <p className="text-sm text-gray-600">Manage your project here.</p>
           </div>
           <div className="flex gap-3">
-            <Select>
-              <SelectTrigger className="w-[280px]">
-                <SelectValue placeholder="Filter by category" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="all">All</SelectItem>
-                <SelectItem value="short-movie">Short Movie</SelectItem>
-                <SelectItem value="music-video">Music Video</SelectItem>
-                <SelectItem value="commercial">Commercial</SelectItem>
-                <SelectItem value="fashion">Fashion</SelectItem>
-                <SelectItem value="others">Others</SelectItem>
-              </SelectContent>
-            </Select>
+            <FilterCategoryDropdown />
             <ModalCreateProject />
           </div>
         </div>
         <hr className="w-full" />
       </div>
-      {/* <Input className="mb-5 focus:border-0" placeholder="Search project by name" /> */}
-      {/* <form action="/" method="get" className="mb-5">
-        <Input
-          className="focus:border-0"
-          placeholder="Search project by name"
-          name="search"
-          defaultValue={searchQuery}
-        />
-      </form> */}
       <SearchInput />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-3 gap-y-5">
         {projects?.map((project: any) => {

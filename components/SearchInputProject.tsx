@@ -10,8 +10,9 @@ const SearchInput = () => {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("search") || "");
 
   useEffect(() => {
+    const paramType = searchParams.get("type") || ""
     const timeoutId = setTimeout(() => {
-      router.replace(`/?search=${searchQuery}`);
+      router.replace(`/?search=${searchQuery}&type=${paramType}`);
     }, 300); // Update the URL 300ms after the user stops typing
 
     return () => clearTimeout(timeoutId);
