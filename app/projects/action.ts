@@ -14,7 +14,7 @@ export async function createProject(formData: FormData) {
   console.log({session})
   const userId = session.user.id;
 
-
+  const id = formData.get('id') as string;
   const title = formData.get('title') as string;
   const categoryId = formData.get('categoryId') as string;
   const role = formData.get('role') as string;
@@ -24,19 +24,38 @@ export async function createProject(formData: FormData) {
   const linkTeaser = formData.get('linkTeaser') as string;
   const coverImageUrl = formData.get('coverImageUrl') as string;
 
-  const { data, error } = await supabase
-    .from('projects')
-    .insert({
-      title,
-      category_id: categoryId,
-      role,
-      client_name: clientName,
-      date_month_project: `${month} ${year}`,
-      link_teaser: linkTeaser,
-      user_id: userId,
-      cover_image_url: coverImageUrl
-    });
+  if (id) {
+    const { data, error } = await supabase
+      .from('projects')
+      .update({
+        title,
+        category_id: categoryId,
+        role,
+        client_name: clientName,
+        date_month_project: `${month} ${year}`,
+        link_teaser: linkTeaser,
+        user_id: userId,
+        cover_image_url: coverImageUrl
+      })
+      .eq('id', id)
 
-  if (error) throw error;
-  return data;
+    if (error) throw error;
+    return data;
+  } else {
+    const { data, error } = await supabase
+      .from('projects')
+      .insert({
+        title,
+        category_id: categoryId,
+        role,
+        client_name: clientName,
+        date_month_project: `${month} ${year}`,
+        link_teaser: linkTeaser,
+        user_id: userId,
+        cover_image_url: coverImageUrl
+      });
+
+    if (error) throw error;
+    return data;
+  }
 }

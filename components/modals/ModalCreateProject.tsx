@@ -239,7 +239,6 @@ const ModalCreateProject = () => {
                 )}></div>
                 }
                 <div
-                  v-if="hoverUploadPhoto || !branch?.logo"
                   className="flex flex-col gap-2 absolute"
                 >
                   <UploadImage
@@ -247,6 +246,8 @@ const ModalCreateProject = () => {
                     onImageUpload={uploadFile}
                     imageUploadState={imageUploadState}
                     disabled={false}
+                    width='w-[12rem]'
+                    height='h-[7rem]'
                   />
                 </div>
               </div>

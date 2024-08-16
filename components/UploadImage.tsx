@@ -7,12 +7,16 @@ interface UploadImageType {
   onImageUpload: (event: ChangeEvent<HTMLInputElement>) => Promise<void>;
   imageUploadState: "loading" | "idle";
   disabled?: boolean;
+  width: string;
+  height: string;
 }
 const UploadImage: React.FC<UploadImageType> = ({
   id = null,
   imageUploadState,
   onImageUpload,
-  disabled
+  disabled,
+  height,
+  width
 }) => {
   const [isDragging, setIsDragging] = useState<boolean>(false)
   const [files, setFiles] = useState<File[]>([])
@@ -43,9 +47,10 @@ const UploadImage: React.FC<UploadImageType> = ({
       onDragLeave={dragleave}
       onDrop={drop}
       className={ cn(
-        isDragging && 'border-black',
-        "dropzone flex justify-center items-center w-[12rem] cursor-pointer",
-        imageUploadState !== 'loading' && !disabled,
+          isDragging && 'border-black',
+          "dropzone flex justify-center items-center cursor-pointer",
+          imageUploadState !== 'loading' && !disabled,
+          width, height
         )
       }
     >
