@@ -1,6 +1,8 @@
+"use server"
+import { createClient } from "@/utils/supabase/server"
 import React from 'react';
 import { cn } from '@/lib/utils';
-import { Button } from './ui/button';
+import { Social } from "@/composables/social.types";
 import {
   Table,
   TableBody,
@@ -13,8 +15,15 @@ import {
 } from "@/components/ui/table"
 import { Icon } from '@iconify/react';
 import ModalAddEditSocial from './modals/ModalAddEditSocial';
+import { SOCIALLIST } from "@/common/socials";
+const Socials = async () => {
+  const supabase = createClient();
+  const { data: socials, error } = await supabase
+    .from('social') // Adjust this to your table name
+    .select('id, key, username')
+    .eq("user_id", `${process.env.NEXT_PUBLIC_SUPABASE_USER_ID}`)
 
-const Socials = () => {
+  console.log({socials})
   const socialMedia = [
     {
       id: "XXX",
@@ -64,27 +73,29 @@ const Socials = () => {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {socialMedia.map((social) => (
-            <TableRow key={social.id}>
-              <TableCell className='flex gap-2'>
-                <Icon
-                  icon={social.logo}
-                  className={cn(
-                    "text-3xl",
-                    social.color
-                  )}
-                />
-                {/* <p>{social.socialName}</p> */}
-              </TableCell>
-              <TableCell className='min-w-[90%]'>
-                {social.username}
-              </TableCell>
-              <TableCell>
-                <ModalAddEditSocial isEdit/>
-              </TableCell>
-              {/* <TableCell className="text-right">{invoice.totalAmount}</TableCell> */}
-            </TableRow>
-          ))}
+          {socials?.map((social: Partial<Social>) => {
+            return (
+              <TableRow key={social.id}>
+                <TableCell className='flex gap-2'>
+                  <Icon
+                    icon={SOCIALLIST?.find((socialItem) => socialItem?.socialKey === social.key)?.logo!}
+                    className={cn(
+                      "text-3xl",
+                      SOCIALLIST?.find((socialItem) => socialItem?.socialKey === social.key)?.color!
+                    )}
+                  />
+                  {/* <p>{social.socialName}</p> */}
+                </TableCell>
+                <TableCell className='min-w-[90%]'>
+                  {social.username}
+                </TableCell>
+                <TableCell>
+                  <ModalAddEditSocial isEdit data={social}/>
+                </TableCell>
+                {/* <TableCell className="text-right">{invoice.totalAmount}</TableCell> */}
+              </TableRow>
+            )
+          })}
         </TableBody>
       </Table>
     </>

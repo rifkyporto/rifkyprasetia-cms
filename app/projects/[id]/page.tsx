@@ -89,7 +89,7 @@ const ProjectDetail: React.FC<PageProps> = async ({ params, searchParams }) => {
           <Information id={id} project={project && project[0]} />
         )}
         {type === "showcase" && (
-          <Showcase />
+          <Showcase id={id} />
         )}
         
       </div>

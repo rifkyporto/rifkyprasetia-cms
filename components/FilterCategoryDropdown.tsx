@@ -20,13 +20,12 @@ const FilterCategoryDropdown = () => {
   const [searchQuery, setSearchQuery] = useState(searchParams.get("type") || "");
   const supabase = createClient();
 
-  const [projectCategories, setProjectCategories] = useState<CategoryDropdownType[]>([])
+  const [projectCategories, setProjectCategories] = useState<Partial<CategoryDropdownType>[]>([])
 
   const fetchCategory = async () => {
     const { data: categories, error } = await supabase
       .from('category') // Adjust this to your table name
       .select(`
-        id,
         name,
         slug
       `)
@@ -37,8 +36,8 @@ const FilterCategoryDropdown = () => {
 
     if (categories) {
       setProjectCategories([
-        { id: "all", name: "All", slug: "all" },
-        ...(categories?.map((category: CategoryDropdownType) => category))
+        { name: "All", slug: "all" },
+        ...(categories?.map((category: Partial<CategoryDropdownType>) => category))
       ])
     }
     
@@ -73,8 +72,8 @@ const FilterCategoryDropdown = () => {
         <SelectValue placeholder="Filter by category" />
       </SelectTrigger>
       <SelectContent>
-        {projectCategories?.map((category: CategoryDropdownType) => (
-          <SelectItem value={category.slug}>{category.name}</SelectItem>
+        {projectCategories?.map((category: Partial<CategoryDropdownType>) => (
+          <SelectItem value={category.slug!}>{category.name}</SelectItem>
         ))}
         {/* <SelectItem value="all">All</SelectItem>
         <SelectItem value="short-movie">Short Movie</SelectItem>

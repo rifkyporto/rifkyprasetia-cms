@@ -3,7 +3,7 @@
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 
-export async function categoryAction(formData: FormData) {
+export async function categoryAction(formData: FormData, isEdit: boolean) {
   const supabase = createClient();
 
   const { data: { session } } = await supabase.auth.getSession();
@@ -14,34 +14,33 @@ export async function categoryAction(formData: FormData) {
   console.log({session})
   const userId = session.user.id;
 
-  const id = formData.get('id') as string;
+  // const id = formData.get('id') as string;
   const name = formData.get('name') as string;
   const slug = formData.get('slug') as string;
 
-  if (slug) {
-    const { data: checkSlug } = await supabase
-      .from('category')
-      .select(`
-        id,
-        slug
-      `)
-      .eq("slug", slug)
+  // if (slug) {
+  //   const { data: checkSlug } = await supabase
+  //     .from('category')
+  //     .select(`
+  //       slug
+  //     `)
+  //     .eq("slug", slug)
+  //     .eq("user_id", userId)
 
-    if (id && checkSlug && id !== checkSlug[0].id) {
-      throw new Error('Slug already exists');
-    } else if (!id && checkSlug) {
-      throw new Error('Slug already exists');
-    }
-  }
+  //   if (checkSlug) {
+  //     throw new Error('Slug already exists');
+  //   }
+  // }
 
-  if (id) {
+  if (isEdit) {
     const { data, error } = await supabase
       .from('category')
       .update({
-        name, slug: slug
+        name,
+        updated_at: new Date()
       })
-      .eq('id', id);
-
+      .eq('slug', slug).select()
+    console.log({data})
     if (error) throw error;
     return data;
   } else {

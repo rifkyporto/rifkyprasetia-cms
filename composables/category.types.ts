@@ -1,5 +1,5 @@
 export type CategoryDropdownType = {
-  id: string;
   name: string;
   slug: string;
+  updated_at: Date;
 }

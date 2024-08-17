@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import moment from "moment"
 import { CategoryDropdownType } from "@/composables/category.types"
 import { Icon } from '@iconify/react'
 import { Button } from "@/components/ui/button"
@@ -20,7 +21,7 @@ const Categories = async () => {
   const supabase = createClient();
   const { data: categories, error } = await supabase
     .from('category') // Adjust this to your table name
-    .select('*')
+    .select('slug, name, updated_at')
     .eq("user_id", `${process.env.NEXT_PUBLIC_SUPABASE_USER_ID}`)
 
   console.log({categories})
@@ -68,18 +69,18 @@ const Categories = async () => {
         <TableCaption>A list of your category database.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead className="w-[100px]">ID</TableHead>
-            <TableHead>Name</TableHead>
             <TableHead>Slug</TableHead>
+            <TableHead>Name</TableHead>
+            <TableHead>Last Updated</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {categories?.map((category) => (
-            <TableRow key={category.id}>
-              <TableCell className="font-medium">{category.id}</TableCell>
-              <TableCell>{category.name}</TableCell>
+            <TableRow key={category.slug}>
               <TableCell>{category.slug}</TableCell>
+              <TableCell>{category.name}</TableCell>
+              <TableCell>{moment(category.updated_at).format("DD MMMM YYYY")}</TableCell>
               <TableCell>
                 <ModalAddEditCategory
                   isEdit

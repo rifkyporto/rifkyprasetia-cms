@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/client"
 import React, { ChangeEvent } from 'react'
+import { useRouter } from "next/navigation";
 import { ErrorInputTag } from "@/composables/validation.types";
 import { CategoryDropdownType } from '@/composables/category.types';
 import { categoryAction } from '@/app/category/action';
@@ -27,6 +28,7 @@ interface ModalAddEditCategoryType {
 }
 const ModalAddEditCategory: React.FC<ModalAddEditCategoryType> = ({ isEdit, data }) => {
   const { toast } = useToast();
+  const router = useRouter();
   const [inputValue, setInputValue] = React.useState<string>(data?.slug || '');
   const [errorFeedback, setErrorFeedback] = React.useState<ErrorInputTag[]>([]);
   const [loadingSubmit, setLoadingSubmit] = React.useState<'loading' | 'idle'>('idle');
@@ -51,23 +53,25 @@ const ModalAddEditCategory: React.FC<ModalAddEditCategoryType> = ({ isEdit, data
 
       setErrorFeedback([]);
 
-      if (isEdit && data?.id) {
+      if (isEdit) {
         // Update existing category
-        formData.set('id', data?.id);
         console.log("edit")
-        await categoryAction(formData);
+        formData.set('slug', data?.slug!)
+        await categoryAction(formData, isEdit);
         toast({
           title: "Success edit category",
         })
 
         closeButton?.click();
+        router.refresh()
       } else {
-        await categoryAction(formData);
+        await categoryAction(formData, false);
         toast({
           title: "Success create category",
         })
 
         closeButton?.click();
+        router.refresh()
       }
     } catch (error: unknown) {
       if (error instanceof Error) {
@@ -90,14 +94,7 @@ const ModalAddEditCategory: React.FC<ModalAddEditCategoryType> = ({ isEdit, data
   };
 
   const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
-    // Get the current value of the input
     let value = e.target.value;
-
-    // Convert to lowercase, replace spaces with hyphens, and remove any characters that aren't lowercase letters or hyphens
-    // value = value
-    //   .toLowerCase()
-    //   .replace(/ /g, '-')        // Replace spaces with hyphens
-    //   .replace(/[^a-z-]/g, '');  // Remove any character that's not a lowercase letter or a hyphen
 
     value = value
       .toLowerCase()
@@ -136,15 +133,20 @@ const ModalAddEditCategory: React.FC<ModalAddEditCategoryType> = ({ isEdit, data
                 </small>
               )}
             </Label>
-            <Label className='flex flex-col gap-2'>
-              Category Slug (auto-generated)
-              <Input id="slug" name="slug" onChange={handleInputChange} value={inputValue} className='lg:max-w-2xl' placeholder='Enter your slug name' defaultValue={data?.slug}/>
-              <small className="">
-                it will be auto-generated if this field is empty
-              </small>
-            </Label>
+            {!isEdit && (
+              <Label className='flex flex-col gap-2'>
+                Category Slug (auto-generated)
+                <Input id="slug" name="slug" onChange={handleInputChange} value={inputValue} className='lg:max-w-2xl' placeholder='Enter your slug name' defaultValue={data?.slug}/>
+                <small className="">
+                  You cannot edit this field once its already created
+                </small>
+                <small className="">
+                  It will be auto-generated if this field is empty
+                </small>
+              </Label>
+            )}
           </div>
-          <DialogFooter>
+          <DialogFooter className="mt-3">
             <DialogClose asChild className='hidden'>
               <Button id='close-modal-category'>close</Button>
             </DialogClose>
