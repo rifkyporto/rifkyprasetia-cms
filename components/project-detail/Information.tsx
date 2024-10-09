@@ -100,6 +100,7 @@ const Information: React.FC<InformationProp> = ({ id, project }) => {
       .getPublicUrl(data.url).data.publicUrl;
 
       setCoverProject(getImage)
+      setIsEdit(true)
     } catch (error: any) {
       console.error(error.message)
       // alert(error.message);
@@ -152,12 +153,12 @@ const Information: React.FC<InformationProp> = ({ id, project }) => {
         message: "Date of Project is required.",
       });
     }
-    if (!linkTeaser) {
-      errors.push({
-        id: "linkTeaser",
-        message: "Link To Watch is required.",
-      });
-    }
+    // if (!linkTeaser) {
+    //   errors.push({
+    //     id: "linkTeaser",
+    //     message: "Link To Watch is required.",
+    //   });
+    // }
     console.log({errors})
     if (errors.length) {
       setErrorFeedback([...errors]);
@@ -210,7 +211,7 @@ const Information: React.FC<InformationProp> = ({ id, project }) => {
         <div className='flex flex-col gap-3'>
           Project Image
           <div
-            className="flex gap-4 relative w-[300px]"
+            className="flex gap-4 relative w-[300px] h-[157px]"
             onMouseEnter={() => setHoverUploadPhoto(true)}
             onMouseLeave={() => setHoverUploadPhoto(false)}
           >
@@ -224,7 +225,7 @@ const Information: React.FC<InformationProp> = ({ id, project }) => {
               // height={100}
               // priority
               className={cn(
-                "w-[300px] rounded-lg",
+                "w-[300px] rounded-lg object-cover",
                 hoverUploadPhoto && 'brightness-50'
               )}
             />

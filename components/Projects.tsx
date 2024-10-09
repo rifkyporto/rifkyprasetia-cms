@@ -45,10 +45,10 @@ const Projects = async ({ searchParams }: { searchParams: { search?: string, typ
                 alt="Vercel Logo"
                 // fill
                 // className={`dark:invert ${isOverlayInspect && "grayscale"} transition-all duration-500 w-[100%] h-auto`}
-                // width={320}
-                // height={100}
+                width={320}
+                height={100}
                 // priority
-                className="w-full rounded-lg"
+                className="w-full rounded-lg object-cover h-[250px]"
               />
               <div className="flex justify-between items-start">
                 <div className="flex flex-col pl-1">
