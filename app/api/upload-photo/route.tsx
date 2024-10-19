@@ -7,7 +7,7 @@ export async function POST(request: Request) {
   try {
     const supabase = createClient();
     const formData = await request.formData();
-    const file = formData.get('file');
+    const file: any = formData.get('file');
 
     if (!file) {
       return NextResponse.json({ error: 'No file selected' }, { status: 400 });
