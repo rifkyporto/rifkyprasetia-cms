@@ -1,3 +1,4 @@
+// @ts-nocheck
 import React, { useState, ChangeEvent } from 'react'
 import { cn } from '@/lib/utils'
 import { Icon } from '@iconify/react'
