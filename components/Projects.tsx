@@ -9,7 +9,7 @@ import SearchInput from "./SearchInputProject";
 import FilterCategoryDropdown from "./FilterCategoryDropdown";
 
 const Projects = async ({ searchParams }: { searchParams: { search?: string, type?: string } }) => {
-  const searchQuery = searchParams.search || "";
+  // const searchQuery = searchParams.search || "";
   const typeQuery = searchParams.type || "";
   console.log({typeQuery})
   const supabase = createClient();
@@ -23,9 +23,9 @@ const Projects = async ({ searchParams }: { searchParams: { search?: string, typ
     .from('project_categories')
     .select(`
       *,
-      projects (*)
+      projects (id, title, position, cover_image_url, role, date_month_project)
     `)
-    .ilike("projects.title", `%${searchQuery}%`)
+    // .ilike("projects.title", `%${searchQuery}%`)
     .ilike("category_id", `%${typeQuery}%`)
   console.log({projects})
 
@@ -60,9 +60,9 @@ const Projects = async ({ searchParams }: { searchParams: { search?: string, typ
         </div>
         <hr className="w-full" />
       </div>
-      <SearchInput />
+      {/* <SearchInput /> */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-4 gap-x-3 gap-y-5">
-        {allProjects?.sort((a, b) => a.position! - b.position!)?.map((project: any) => {
+        {allProjects?.sort((a, b) => a?.position! - b?.position!)?.map((project: any) => {
           return (
             <Link href={`/projects/${project.id}`} className="flex flex-col gap-2 w-full">
               <img

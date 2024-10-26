@@ -45,11 +45,12 @@ const FilterCategoryDropdown = () => {
   }
 
   useEffect(() => {
-    const paramSearch = searchParams.get("search")
+    // const paramSearch = searchParams.get("search")
     // const timeoutId = setTimeout(() => {
     //   router.replace(`/?search=${paramSearch}&type=${searchQuery}`);
     // }, 300); // Update the URL 300ms after the user stops typing
-    router.replace(`/?search=${paramSearch}&type=${searchQuery}`);
+    // router.replace(`/?search=${paramSearch}&type=${searchQuery}`);
+    router.replace(`/?type=${searchQuery}`);
     // return () => clearTimeout(timeoutId);
   }, [searchQuery, router]);
 

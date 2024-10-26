@@ -37,7 +37,7 @@ const Project = ({ project }: { project: ProjectDetailType }) => {
         alt="Project Cover"
         className="w-full rounded-t-lg object-cover h-[250px]"
       />
-      <div className="flex justify-between items-start pt-2 pb-4 px-4">
+      <div className="flex justify-between items-start pt-2 pb-1 px-4">
         <div className="flex flex-col pl-1">
           <p className="text-xl">{project?.title}</p>
           <p className="text-gray-500 text-sm font-light">{project.role}, {project.date_month_project}</p>
