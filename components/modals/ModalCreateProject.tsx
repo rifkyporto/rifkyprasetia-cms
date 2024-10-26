@@ -25,16 +25,25 @@ import {
 } from "@/components/ui/select"
 import { useToast } from "@/components/ui/toast"
 import { createClient } from "@/utils/supabase/client";
-
+import { MultiSelect } from "@/components/ui/multi-select";
 import { Button } from '../ui/button'
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
 import { createProject } from '@/app/projects/action';
 import UploadImage from '../UploadImage';
+import { Icon } from '@iconify/react';
+import { CategoryDropdownType } from '@/composables/category.types';
 
-const ModalCreateProject = () => {
+const ModalCreateProject = ({ categories }: { categories: CategoryDropdownType[] }) => {
   const { toast } = useToast()
   const supabase = createClient();
+
+  const categoriesOpt = categories?.map((category) => { 
+    return {
+      label: category?.name,
+      value: category?.slug
+    }
+   })
 
   const [isMounted, setIsMounted] = useState(false);
   const [submitState, setSubmitState] = useState<'loading' | 'idle'>('idle');
@@ -42,6 +51,7 @@ const ModalCreateProject = () => {
 
   const [coverProject, setCoverProject] = useState<string>('');
   const [categoryId, setCategoryId] = useState<string>('');
+  const [categoryIds, setCategoryIds] = useState<string[]>([]);
   const [month, setMonth] = useState<string>('');
   const [year, setYear] = useState<string>('');
 
@@ -78,12 +88,12 @@ const ModalCreateProject = () => {
         message: "Project Name is required.",
       });
     }
-    if (!categoryId) {
-      errors.push({
-        id: "categoryId",
-        message: "Project Category is required.",
-      });
-    }
+    // if (!categoryIds || !categoryIds.length) {
+    //   errors.push({
+    //     id: "categoryId",
+    //     message: "Project Category is required.",
+    //   });
+    // }
     if (!role) {
       errors.push({
         id: "role",
@@ -117,13 +127,16 @@ const ModalCreateProject = () => {
     
     setErrorFeedback([])
 
-    formData.set('categoryId', categoryId);
+    formData.set('categoryIds', JSON.stringify(categoryIds));
     formData.set('month', month);
     formData.set('year', year);
     formData.set('coverImageUrl', coverProject);
 
+    let id = "";
     try {
-      await createProject(formData);
+      const data = await createProject(formData);
+      id = data?.[0].id
+
       toast({
         title: "Success create new project",
         description: "Don't forget to add the project showcase on detail project.",
@@ -138,6 +151,8 @@ const ModalCreateProject = () => {
       })
     } finally {
       setSubmitState('idle');
+
+      window.location.replace(`/projects/${id}`)
     }
   }
 
@@ -207,7 +222,11 @@ const ModalCreateProject = () => {
 
   return (
     <Dialog onOpenChange={handleCleanUp}>
-      <DialogTrigger><Button variant={"outline"}>Add Project</Button></DialogTrigger>
+      <DialogTrigger>
+        <Button variant={"outline"} className='flex gap-1'>
+          <Icon icon="gridicons:add-outline" className='text-xl'/> Add Project
+        </Button>
+      </DialogTrigger>
       <DialogContent className='min-w-[700px] max-h-[90vh] overflow-scroll'>
         <DialogHeader>
           <DialogTitle>Create Project</DialogTitle>
@@ -274,7 +293,18 @@ const ModalCreateProject = () => {
             </Label>
             <Label className='flex flex-col gap-2'>
               Project Type
-              <Select onValueChange={(value) => setCategoryId(value)}>
+              <MultiSelect
+                options={categoriesOpt!}
+                onValueChange={(val) => setCategoryIds(val)}
+                defaultValue={categoryIds}
+                placeholder="Select Category"
+                variant="inverted"
+                animation={2}
+                maxCount={3}
+                className="lg:max-w-2xl z-[9999999999]"
+              />
+
+              {/* <Select onValueChange={(value) => setCategoryId(value)}>
                 <SelectTrigger className="lg:max-w-2xl outline-none focus:shadow-outline p-2 placeholder:text-gray-400 flex">
                   <SelectValue placeholder="Select category" />
                 </SelectTrigger>
@@ -286,7 +316,7 @@ const ModalCreateProject = () => {
                   <SelectItem value="fashion">Fashion</SelectItem>
                   <SelectItem value="others">Others</SelectItem>
                 </SelectContent>
-              </Select>
+              </Select> */}
               {errorFeedback?.find((err) => err.id === 'categoryId') && (
                 <small className="text-red-500">
                   {errorFeedback.find((err) => err.id === "categoryId")?.message }

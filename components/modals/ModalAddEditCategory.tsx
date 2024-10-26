@@ -110,7 +110,9 @@ const ModalAddEditCategory: React.FC<ModalAddEditCategoryType> = ({ isEdit, data
     <Dialog>
       <DialogTrigger>
         {isEdit ? 
-          <Icon icon="lucide:edit" className='text-xl cursor-pointer' />
+          <Button variant={"outline"}>
+            <Icon icon="lucide:edit" className='text-xl cursor-pointer' />
+          </Button>
           : <><Button variant={"outline"}>Add Category</Button></>
         }
       </DialogTrigger>

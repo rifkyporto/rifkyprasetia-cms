@@ -16,6 +16,7 @@ import { CategoryDropdownType } from "@/composables/category.types"
 import { Icon } from '@iconify/react'
 import { Button } from "@/components/ui/button"
 import ModalAddEditCategory from './modals/ModalAddEditCategory';
+import Link from "next/link"
 
 const Categories = async () => {
   const supabase = createClient();
@@ -25,33 +26,6 @@ const Categories = async () => {
     .eq("user_id", `${process.env.NEXT_PUBLIC_SUPABASE_USER_ID}`)
 
   console.log({categories})
-  const categoriess = [
-    {
-      id: "XXXX",
-      name: "Short Film",
-      value: "short-film",
-    },
-    {
-      id: "XXXX",
-      name: "Music Video",
-      value: "music-video",
-    },
-    {
-      id: "XXXX",
-      name: "Commercial",
-      value: "commercial",
-    },
-    {
-      id: "XXXX",
-      name: "Fashion",
-      value: "fashion",
-    },
-    {
-      id: "XXXX",
-      name: "Others",
-      value: "others",
-    },
-  ]
 
   return (
     <>
@@ -81,11 +55,14 @@ const Categories = async () => {
               <TableCell>{category.slug}</TableCell>
               <TableCell>{category.name}</TableCell>
               <TableCell>{moment(category.updated_at).format("DD MMMM YYYY")}</TableCell>
-              <TableCell>
+              <TableCell className="flex gap-2">
                 <ModalAddEditCategory
                   isEdit
                   data={category}
                 />
+                <Link href={`/category/${category.slug}`}>
+                  <Button variant={'outline'}><Icon icon="rivet-icons:settings" /></Button>
+                </Link>
               </TableCell>
             </TableRow>
           ))}

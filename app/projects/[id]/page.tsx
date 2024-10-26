@@ -31,9 +31,20 @@ const ProjectDetail: React.FC<PageProps> = async ({ params, searchParams }) => {
 
   const { data: project, error } = await supabase
     .from('projects') // Adjust this to your table name
-    .select('*')
+    .select(`
+      *,
+      project_categories (
+        *,
+        category (*)
+      )
+    `)
     .eq("id", id)
 
+  const { data: categories, error: errorCategories } = await supabase
+    .from('category') // Adjust this to your table name
+    .select('*')
+    .eq("user_id", process.env.NEXT_PUBLIC_SUPABASE_USER_ID)
+  console.log({categories})
   const type = searchParams.type;
   console.log({type, project})
   const sidebarNavItems = [
@@ -86,7 +97,7 @@ const ProjectDetail: React.FC<PageProps> = async ({ params, searchParams }) => {
           </nav>
         </div>
         {(!type || type === "information") && (
-          <Information id={id} project={project && project[0]} />
+          <Information id={id} project={project && project[0]} categories={categories} />
         )}
         {type === "showcase" && (
           <Showcase id={id} />

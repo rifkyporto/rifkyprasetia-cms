@@ -67,6 +67,7 @@ const FilterCategoryDropdown = () => {
         if (value === "all") setSearchQuery('')
         else setSearchQuery(value)
       }}
+      defaultValue={searchQuery}
     >
       <SelectTrigger className="w-[280px]">
         <SelectValue placeholder="Filter by category" />

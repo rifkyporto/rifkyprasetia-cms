@@ -21,23 +21,38 @@ import { cn } from '@/lib/utils'
 import { ProjectDetailType } from '@/composables/project.types';
 import { ErrorInputTag } from "@/composables/validation.types";
 import { Button } from "@/components/ui/button"
+import { MultiSelect } from "@/components/ui/multi-select";
 import UploadImage from '../UploadImage';
+import { CategoryDropdownType } from "@/composables/category.types";
 
 interface InformationProp {
   id: string;
   project: ProjectDetailType | null
+  categories: CategoryDropdownType[] | null
 }
-const Information: React.FC<InformationProp> = ({ id, project }) => {
+const Information: React.FC<InformationProp> = ({ id, project, categories }) => {
   const supabase = createClient();
   const { toast } = useToast()
   const router = useRouter();
+  console.log({cc: project?.project_categories})
+  const categoriesOpt = categories?.map((category) => { 
+    return {
+      label: category?.name,
+      value: category?.slug
+    }
+   })
 
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [month, setMonth] = useState<string>(project?.date_month_project?.split(" ")?.[0] || '');
   const [year, setYear] = useState<string>(project?.date_month_project?.split(" ")?.[1] || '');
   const [categoryId, setCategoryId] = useState<string>(project?.category_id || '');
+  const [categoryIds, setCategoryIds] = useState<string[]>(
+    project?.project_categories?.map((cat) => {
+      return cat?.category?.slug
+    }) || []
+  );
   const [coverProject, setCoverProject] = useState<string>(project?.cover_image_url || '');
-
+  console.log({categoryIds})
   const [hoverUploadPhoto, setHoverUploadPhoto] = useState<boolean>(false);
   const [imageUploadState, setImageUploadState] = useState<"loading" | "idle">('idle');
   const [errorUploadPhoto, setErrorUploadPhoto] = useState<string>('');
@@ -135,6 +150,12 @@ const Information: React.FC<InformationProp> = ({ id, project }) => {
         message: "Project Category is required.",
       });
     }
+    if (!categoryIds || !categoryIds.length) {
+      errors.push({
+        id: "categoryId",
+        message: "Project Category is required.",
+      });
+    }
     if (!role) {
       errors.push({
         id: "role",
@@ -170,6 +191,7 @@ const Information: React.FC<InformationProp> = ({ id, project }) => {
 
     formData.set('id', id);
     formData.set('categoryId', categoryId);
+    formData.set('categoryIds', JSON.stringify(categoryIds));
     formData.set('month', month);
     formData.set('year', year);
     formData.set('coverImageUrl', coverProject);
@@ -261,7 +283,21 @@ const Information: React.FC<InformationProp> = ({ id, project }) => {
         </Label>
         <Label className='flex flex-col gap-3'>
           Project Type
-          <Select
+
+          <MultiSelect
+            options={categoriesOpt!}
+            onValueChange={(val) => {
+              setCategoryIds(val);
+              !isEdit && setIsEdit(true)
+            }}
+            defaultValue={categoryIds}
+            placeholder="Select Category"
+            variant="inverted"
+            animation={2}
+            maxCount={3}
+            className="lg:max-w-2xl"
+          />
+          {/* <Select
             defaultValue={categoryId}
             onValueChange={(val) => {
               setCategoryId(val)
@@ -279,7 +315,7 @@ const Information: React.FC<InformationProp> = ({ id, project }) => {
               <SelectItem value="fashion">Fashion</SelectItem>
               <SelectItem value="others">Others</SelectItem>
             </SelectContent>
-          </Select>
+          </Select> */}
         </Label>
         <Label className='flex flex-col gap-3'>
           Role
