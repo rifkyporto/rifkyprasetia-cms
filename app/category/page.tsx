@@ -1,4 +1,3 @@
-"use server";
 import { createClient } from "@/utils/supabase/server"
 import React from 'react'
 import { Button } from "@/components/ui/button"
