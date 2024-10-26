@@ -43,7 +43,7 @@ const ProjectDetail: React.FC<PageProps> = async ({ params, searchParams }) => {
   const { data: categories, error: errorCategories } = await supabase
     .from('category') // Adjust this to your table name
     .select('*')
-    .eq("user_id", process.env.NEXT_PUBLIC_SUPABASE_USER_ID)
+    // .eq("user_id", process.env.NEXT_PUBLIC_SUPABASE_USER_ID)
   console.log({categories})
   const type = searchParams.type;
   console.log({type, project})

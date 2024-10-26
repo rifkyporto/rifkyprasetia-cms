@@ -23,7 +23,7 @@ const Categories = async () => {
   const { data: categories, error } = await supabase
     .from('category') // Adjust this to your table name
     .select('slug, name, updated_at')
-    .eq("user_id", `${process.env.NEXT_PUBLIC_SUPABASE_USER_ID}`)
+    // .eq("user_id", `${process.env.NEXT_PUBLIC_SUPABASE_USER_ID}`)
 
   console.log({categories})
 

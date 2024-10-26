@@ -29,7 +29,7 @@ const FilterCategoryDropdown = () => {
         name,
         slug
       `)
-      .eq("user_id", `${process.env.NEXT_PUBLIC_SUPABASE_USER_ID!}`)
+      // .eq("user_id", `${process.env.NEXT_PUBLIC_SUPABASE_USER_ID!}`)
       // .ilike("user_id", `${process.env.NEXT_PUBLIC_SUPABASE_USER_ID!}`)
     
     console.log({categories, uid: process.env.NEXT_PUBLIC_SUPABASE_USER_ID})

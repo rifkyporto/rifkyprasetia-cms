@@ -21,7 +21,7 @@ const Socials = async () => {
   const { data: socials, error } = await supabase
     .from('social') // Adjust this to your table name
     .select('id, key, username')
-    .eq("user_id", `${process.env.NEXT_PUBLIC_SUPABASE_USER_ID}`)
+    // .eq("user_id", `${process.env.NEXT_PUBLIC_SUPABASE_USER_ID}`)
 
   console.log({socials})
   const socialMedia = [

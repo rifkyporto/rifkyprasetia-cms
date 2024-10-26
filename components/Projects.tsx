@@ -1,4 +1,3 @@
-"use server";
 import { createClient } from "@/utils/supabase/server"
 import React from 'react'
 import { Button } from "@/components/ui/button"
@@ -39,7 +38,7 @@ const Projects = async ({ searchParams }: { searchParams: { search?: string, typ
     .select(`
       *
     `)
-    .eq("user_id", process.env.NEXT_PUBLIC_SUPABASE_USER_ID)
+    // .eq("user_id", process.env.NEXT_PUBLIC_SUPABASE_USER_ID)
   console.log({projects})
 
   return (
