@@ -10,6 +10,8 @@ import Projects from "@/components/Projects";
 import Categories from "@/components/Categories";
 import Socials from "@/components/Socials";
 
+export const dynamic = "force-dynamic";
+
 export default async function Index({ searchParams }: { searchParams: { search?: string } }) {
   return (
     <Layout className="w-full flex flex-col gap-10 ">

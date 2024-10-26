@@ -6,6 +6,8 @@ import { Icon } from "@iconify/react";
 import Link from 'next/link';
 import ReorderCategoryProjects from "@/components/reorder-project-category";
 
+export const dynamic = "force-dynamic";
+
 const Projects = async ({ params, searchParams }: { params: { id: string }, searchParams: { search?: string, type?: string } }) => {
   const id = params.id;
   const searchQuery = searchParams.search || "";

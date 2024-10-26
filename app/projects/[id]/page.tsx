@@ -25,6 +25,8 @@ interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
+export const dynamic = "force-dynamic";
+
 const ProjectDetail: React.FC<PageProps> = async ({ params, searchParams }) => {
   const supabase = createClient();
   const id = params.id;
