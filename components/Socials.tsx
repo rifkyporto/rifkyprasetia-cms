@@ -16,42 +16,15 @@ import {
 import { Icon } from '@iconify/react';
 import ModalAddEditSocial from './modals/ModalAddEditSocial';
 import { SOCIALLIST } from "@/common/socials";
+
 const Socials = async () => {
   const supabase = createClient();
   const { data: socials, error } = await supabase
     .from('social') // Adjust this to your table name
-    .select('id, key, username')
+    .select('id, key, link')
     // .eq("user_id", `${process.env.NEXT_PUBLIC_SUPABASE_USER_ID}`)
 
-  console.log({socials})
-  const socialMedia = [
-    {
-      id: "XXX",
-      socialKey: "instagram",
-      socialName: "Instagram",
-      username: "@xyz",
-      logo: "uil:instagram-alt",
-      color: "text-pink-600"
-    },
-    {
-      id: "XXX",
-      socialKey: "linkedin",
-      socialName: "Linkedin",
-      username: "@xyz-xyz",
-      logo: "mdi:linkedin",
-      color: "text-blue-600"
-    },
-    {
-      id: "XXX",
-      socialKey: "youtube",
-      socialName: "Youtube",
-      username: "@xyz-xyz",
-      logo: "mdi:youtube",
-      color: "text-red-600"
-    },
-  ]
-
-  return (
+    return (
     <>
       <div className="flex flex-col gap-5 my-10">
         <div className="flex justify-between items-center">
@@ -68,7 +41,7 @@ const Socials = async () => {
         <TableHeader>
           <TableRow>
             <TableHead>Socials</TableHead>
-            <TableHead>Username</TableHead>
+            <TableHead>Link</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
@@ -84,15 +57,13 @@ const Socials = async () => {
                       SOCIALLIST?.find((socialItem) => socialItem?.socialKey === social.key)?.color!
                     )}
                   />
-                  {/* <p>{social.socialName}</p> */}
                 </TableCell>
                 <TableCell className='min-w-[90%]'>
-                  {social.username}
+                  {social.link}
                 </TableCell>
                 <TableCell>
                   <ModalAddEditSocial isEdit data={social}/>
                 </TableCell>
-                {/* <TableCell className="text-right">{invoice.totalAmount}</TableCell> */}
               </TableRow>
             )
           })}

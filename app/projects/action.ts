@@ -119,7 +119,7 @@ export async function createProject(formData: FormData) {
         .from('project_categories')
         .insert({
           category_id: ids,
-          project_id: id,
+          project_id: data?.[0].id,
           position: 0,
           user_id: process.env.NEXT_PUBLIC_SUPABASE_USER_ID
         });

@@ -1,5 +1,6 @@
 'use server'
 
+import { CategoryDropdownType } from "@/composables/category.types";
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
 
@@ -55,4 +56,26 @@ export async function categoryAction(formData: FormData, isEdit: boolean) {
     if (error) throw error;
     return data;
   }
+}
+
+export async function upsertCategoryPosition(categories: Partial<CategoryDropdownType>[]) {
+  const supabase = createClient();
+
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    throw new Error('Not authenticated');
+  }
+  console.log({session})
+  const userId = session.user.id;
+
+  categories.forEach(async (category) => {
+    const { data, error } = await supabase
+      .from('category')
+      .update({
+        position: category.position,
+        updated_at: new Date()
+      })
+      .eq('slug', category.slug)
+  })
 }

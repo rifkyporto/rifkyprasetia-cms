@@ -21,6 +21,12 @@ import { Icon } from '@iconify/react';
 import { Button } from '../ui/button'
 import { Label } from '../ui/label';
 import { Input } from '../ui/input';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip"
 
 interface ModalAddEditCategoryType {
   isEdit?: boolean
@@ -110,9 +116,18 @@ const ModalAddEditCategory: React.FC<ModalAddEditCategoryType> = ({ isEdit, data
     <Dialog>
       <DialogTrigger>
         {isEdit ? 
-          <Button variant={"outline"}>
-            <Icon icon="lucide:edit" className='text-xl cursor-pointer' />
-          </Button>
+          <TooltipProvider>
+            <Tooltip>
+              <TooltipTrigger>
+                <Button variant={"outline"}>
+                  <Icon icon="lucide:edit" className='text-xl cursor-pointer' />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Edit Category</p>
+              </TooltipContent>
+            </Tooltip>
+          </TooltipProvider>
           : <><Button variant={"outline"}>Add Category</Button></>
         }
       </DialogTrigger>

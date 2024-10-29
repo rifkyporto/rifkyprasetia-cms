@@ -51,7 +51,12 @@ const Projects = async ({ searchParams }: { searchParams: { search?: string, typ
           </div>
           <div className="flex gap-3">
             <FilterCategoryDropdown />
-            <ModalCreateProject categories={categories!} />
+            {/* <ModalCreateProject categories={categories!} /> */}
+            <Link href={'/projects/create'}>
+              <Button variant={"outline"} className='flex gap-1'>
+                <Icon icon="gridicons:add-outline" className='text-xl'/> Add Project
+              </Button>
+            </Link>
             <Link href={'/projects'}>
               <Button variant={'default'} className="flex gap-1"><Icon icon="rivet-icons:settings" /> Reorder Project</Button>
             </Link>

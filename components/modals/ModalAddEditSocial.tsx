@@ -55,15 +55,15 @@ const ModalAddEditSocial: React.FC<ModalAddEditSocialType> = ({ isEdit, data }) 
       setLoadingState('loading');
       const errors = [];
       const closeButton = document.getElementById("close-modal-social");
-      const username = formData.get('username') as string;
+      const link = formData.get('link') as string;
 
-      if (!username) {
-        errors.push({ message: 'Username is required', id: 'username' });
+      if (!link) {
+        errors.push({ message: 'Link is required', id: 'link' });
       }
       if (!social) {
         errors.push({ message: 'Social media is required', id: 'social' });
       }
-      console.log({social, username})
+      console.log({social, link})
       if (errors.length) {
         console.log("error", errors)
         setErrorFeedback(errors);
@@ -153,11 +153,11 @@ const ModalAddEditSocial: React.FC<ModalAddEditSocialType> = ({ isEdit, data }) 
               )}
             </Label>
             <Label className='flex flex-col gap-2'>
-              Social Media Username
-              <Input id='username' name='username' defaultValue={data?.username} className='lg:max-w-2xl' placeholder='Enter your social username'/>
-              {errorFeedback?.find((err) => err.id === 'username') && (
+              Social Media Link
+              <Input id='link' name='link' defaultValue={data?.link} className='lg:max-w-2xl' placeholder='Enter your social media link'/>
+              {errorFeedback?.find((err) => err.id === 'link') && (
                 <small className="text-red-500">
-                  {errorFeedback.find((err) => err.id === "username")?.message }
+                  {errorFeedback.find((err) => err.id === "link")?.message }
                 </small>
               )}
             </Label>

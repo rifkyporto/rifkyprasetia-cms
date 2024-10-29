@@ -26,33 +26,25 @@ import UploadImage from '../UploadImage';
 import { CategoryDropdownType } from "@/composables/category.types";
 
 interface InformationProp {
-  id: string;
-  project: ProjectDetailType | null
   categories: CategoryDropdownType[] | null
 }
-const Information: React.FC<InformationProp> = ({ id, project, categories }) => {
+const CreateProject: React.FC<InformationProp> = ({ categories }) => {
   const supabase = createClient();
   const { toast } = useToast()
   const router = useRouter();
-  console.log({cc: project?.project_categories})
+
   const categoriesOpt = categories?.map((category) => { 
     return {
       label: category?.name,
       value: category?.slug
     }
-   })
+  })
 
-  const [isEdit, setIsEdit] = useState<boolean>(false);
-  const [month, setMonth] = useState<string>(project?.date_month_project?.split(" ")?.[0] || '');
-  const [year, setYear] = useState<string>(project?.date_month_project?.split(" ")?.[1] || '');
-  const [categoryId, setCategoryId] = useState<string>(project?.category_id || '');
-  const [categoryIds, setCategoryIds] = useState<string[]>(
-    project?.project_categories?.map((cat) => {
-      return cat?.category?.slug
-    }) || []
-  );
-  const [coverProject, setCoverProject] = useState<string>(project?.cover_image_url || '');
-  console.log({categoryIds})
+  const [month, setMonth] = useState<string>('');
+  const [year, setYear] = useState<string>('');
+  const [categoryIds, setCategoryIds] = useState<string[]>([]);
+  const [coverProject, setCoverProject] = useState<string>('');
+
   const [hoverUploadPhoto, setHoverUploadPhoto] = useState<boolean>(false);
   const [imageUploadState, setImageUploadState] = useState<"loading" | "idle">('idle');
   const [errorUploadPhoto, setErrorUploadPhoto] = useState<string>('');
@@ -60,13 +52,6 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
   const formRef = useRef<HTMLFormElement>(null);
   const [errorFeedback, setErrorFeedback] = useState<ErrorInputTag[]>([]);
   const [submitState, setSubmitState] = useState<'loading' | 'idle'>('idle');
-
-
-  const handleCancel = (e: any) => {
-    e.preventDefault()
-    formRef.current?.reset(); // Reset the form to its default values
-    setIsEdit(false)
-  };
 
   const uploadFile = async (event: ChangeEvent<HTMLInputElement>) => {
     try {
@@ -115,7 +100,6 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
       .getPublicUrl(data.url).data.publicUrl;
 
       setCoverProject(getImage)
-      setIsEdit(true)
     } catch (error: any) {
       console.error(error.message)
       // alert(error.message);
@@ -125,6 +109,7 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
   };
 
   async function onSubmit(formData: FormData) {
+    console.log("hhh")
     setSubmitState('loading')
     const errors = []
     const title = formData.get('title') as string;
@@ -142,12 +127,6 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
       errors.push({
         id: "title",
         message: "Project Name is required.",
-      });
-    }
-    if (!categoryId) {
-      errors.push({
-        id: "categoryId",
-        message: "Project Category is required.",
       });
     }
     if (!categoryIds || !categoryIds.length) {
@@ -189,17 +168,18 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
     
     setErrorFeedback([])
 
-    formData.set('id', id);
-    formData.set('categoryId', categoryId);
     formData.set('categoryIds', JSON.stringify(categoryIds));
     formData.set('month', month);
     formData.set('year', year);
     formData.set('coverImageUrl', coverProject);
-
+    
+    let id = '';
     try {
-      await createProject(formData);
+      const data = await createProject(formData);
+      id = data?.[0].id
+
       toast({
-        title: "Success edit project",
+        title: "Success add project",
       })
 
       router.refresh()
@@ -213,7 +193,10 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
       })
     } finally {
       setSubmitState('idle');
-      setIsEdit(false);
+
+      setTimeout(() => {
+        window.location.replace(`/projects/${id}`)
+      }, 5000)
     }
   }
 
@@ -223,8 +206,7 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
         <div className='flex justify-between lg:max-w-2xl'>
           <p className='text-2xl'>Project Information</p>
           <div className='flex gap-3'>
-            <Button variant={'outline'} disabled={!isEdit} onClick={handleCancel}>Cancel</Button>
-            <Button type="submit" disabled={!isEdit || submitState === 'loading'}>{submitState === 'loading' ? "Saving..." : "Save"}</Button>
+            <Button type="submit" disabled={submitState === 'loading'}>{submitState === 'loading' ? "Saving..." : "Save"}</Button>
           </div>
         </div>
 
@@ -237,20 +219,23 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
             onMouseEnter={() => setHoverUploadPhoto(true)}
             onMouseLeave={() => setHoverUploadPhoto(false)}
           >
-            <img
-              src={coverProject}
-              // src="https://static.wixstatic.com/media/d9f26d_bfde3c5382e841e290e1026b3784e532~mv2.jpg/v1/fit/w_972,h_548,q_90/d9f26d_bfde3c5382e841e290e1026b3784e532~mv2.webp"
-              alt="Vercel Logo"
-              // fill
-              // className={`dark:invert ${isOverlayInspect && "grayscale"} transition-all duration-500 w-[100%] h-auto`}
-              // width={320}
-              // height={100}
-              // priority
-              className={cn(
-                "w-[300px] rounded-lg object-cover",
-                hoverUploadPhoto && 'brightness-50'
-              )}
-            />
+            {coverProject && (
+              <img
+                src={coverProject}
+                // src="https://static.wixstatic.com/media/d9f26d_bfde3c5382e841e290e1026b3784e532~mv2.jpg/v1/fit/w_972,h_548,q_90/d9f26d_bfde3c5382e841e290e1026b3784e532~mv2.webp"
+                alt="Vercel Logo"
+                // fill
+                // className={`dark:invert ${isOverlayInspect && "grayscale"} transition-all duration-500 w-[100%] h-auto`}
+                // width={320}
+                // height={100}
+                // priority
+                className={cn(
+                  "w-[300px] rounded-lg object-cover",
+                  hoverUploadPhoto && 'brightness-50'
+                )}
+              />
+            )}
+            
             <div
               className="flex flex-col gap-2 absolute"
             >
@@ -269,6 +254,11 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
               {errorUploadPhoto}
             </small>
           )}
+          {errorFeedback?.find((err) => err.id === "coverProject") && (
+            <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              {errorFeedback?.find((err) => err.id === "coverProject")?.message}
+            </small>
+          )}
         </div>
         <Label className='flex flex-col gap-3'>
           Project Name
@@ -277,9 +267,13 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
             name='title'
             placeholder='Enter project name'
             className='lg:max-w-2xl'
-            defaultValue={project?.title}
-            onChange={() => !isEdit && setIsEdit(true)}
+            // defaultValue={project?.title}
           />
+          {errorFeedback?.find((err) => err.id === "title") && (
+            <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              {errorFeedback?.find((err) => err.id === "title")?.message}
+            </small>
+          )}
         </Label>
         <Label className='flex flex-col gap-3'>
           Project Type
@@ -288,15 +282,20 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
             options={categoriesOpt!}
             onValueChange={(val) => {
               setCategoryIds(val);
-              !isEdit && setIsEdit(true)
             }}
-            defaultValue={categoryIds}
+            // defaultValue={categoryIds}
             placeholder="Select Category"
             variant="inverted"
             animation={2}
             maxCount={3}
             className="lg:max-w-2xl"
           />
+
+          {errorFeedback?.find((err) => err.id === "categoryId") && (
+            <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              {errorFeedback?.find((err) => err.id === "categoryId")?.message}
+            </small>
+          )}
         </Label>
         <Label className='flex flex-col gap-3'>
           Role
@@ -305,9 +304,13 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
             name="role"
             placeholder='Enter your role'
             className='lg:max-w-2xl'
-            defaultValue={project?.role}
-            onChange={() => !isEdit && setIsEdit(true)}
+            // defaultValue={project?.role}
           />
+          {errorFeedback?.find((err) => err.id === "role") && (
+            <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              {errorFeedback?.find((err) => err.id === "role")?.message}
+            </small>
+          )}
         </Label>
         <Label className='flex flex-col gap-3'>
           Client
@@ -316,19 +319,23 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
             name="clientName"
             placeholder='Enter your client'
             className='lg:max-w-2xl'
-            defaultValue={project?.client_name}
-            onChange={() => !isEdit && setIsEdit(true)}
+            // defaultValue={project?.client_name}
           />
+
+          {errorFeedback?.find((err) => err.id === "clientName") && (
+            <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              {errorFeedback?.find((err) => err.id === "clientName")?.message}
+            </small>
+          )}
         </Label>
         <Label className='flex flex-col gap-3'>
           Date Project
           {/* <Input placeholder='Enter date project' className='lg:max-w-2xl' /> */}
           <div className='flex gap-2 lg:max-w-2xl'>
             <Select
-              defaultValue={month}
+              // defaultValue={month}
               onValueChange={(value) => {
                 setMonth(value);
-                !isEdit && setIsEdit(true)
               }}
             >
               <SelectTrigger className="lg:max-w-2xl outline-none focus:shadow-outline p-2 placeholder:text-gray-400 flex">
@@ -343,10 +350,9 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
               </SelectContent>
             </Select>
             <Select
-              defaultValue={year}
+              // defaultValue={year}
               onValueChange={(value) => {
                 setYear(value)
-                !isEdit && setIsEdit(true)
               }}
             >
               <SelectTrigger className="lg:max-w-2xl outline-none focus:shadow-outline p-2 placeholder:text-gray-400 flex">
@@ -361,6 +367,12 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
               </SelectContent>
             </Select>
           </div>
+
+          {errorFeedback?.find((err) => err.id === "dateOfProject") && (
+            <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              {errorFeedback?.find((err) => err.id === "dateOfProject")?.message}
+            </small>
+          )}
         </Label>
         <Label className='flex flex-col gap-3'>
           Link to Watch
@@ -369,8 +381,7 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
             name="linkTeaser"
             placeholder='Enter the link'
             className='lg:max-w-2xl'
-            defaultValue={project?.link_teaser}
-            onChange={() => !isEdit && setIsEdit(true)}
+            // defaultValue={project?.link_teaser}
           />
         </Label>
       </form>
@@ -378,4 +389,4 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
   )
 }
 
-export default Information;
+export default CreateProject;
