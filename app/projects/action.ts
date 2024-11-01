@@ -1,6 +1,7 @@
 'use server'
 
 import { createClient } from "@/utils/supabase/server";
+import { utapi } from "@/server/uploadthing";
 import { cookies } from "next/headers";
 import { ShowcaseType } from "@/composables/showcase.types";
 import { IProjectCategories } from "@/composables/project-categories.type";
@@ -397,3 +398,7 @@ export async function deleteShowcase(id: string) {
     .delete()
     .eq('id', id)
 }
+
+export async function deleteImageUploadthing(id: string) {
+  await utapi.deleteFiles(id);
+};

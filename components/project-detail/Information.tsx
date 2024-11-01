@@ -2,7 +2,7 @@
 
 import { createClient } from "@/utils/supabase/client";
 import { useRouter } from 'next/navigation';
-import { createProject } from "@/app/projects/action";
+import { createProject, deleteImageUploadthing } from "@/app/projects/action";
 import { MONTH_LIST, YEAR_LIST } from '@/common/date-config';
 import React, { useState, useRef, ChangeEvent } from 'react'
 import { Input } from '@/components/ui/input'
@@ -27,6 +27,7 @@ import { CategoryDropdownType } from "@/composables/category.types";
 import { Icon } from "@iconify/react";
 import ModalDeleteProject from "../modals/ModalDeleteProject";
 import { handleFileDelete } from "@/lib/utils-client";
+import { UploadButton } from "@/utils/uploadthing";
 
 interface InformationProp {
   id: string;
@@ -56,6 +57,7 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
   );
   const [coverProject, setCoverProject] = useState<string>(project?.cover_image_url || '');
   console.log({coverProject})
+  const [bannerProject, setBannerProject] = useState<string>(project?.banner_url || '');
   const [hoverUploadPhoto, setHoverUploadPhoto] = useState<boolean>(false);
   const [imageUploadState, setImageUploadState] = useState<"loading" | "idle">('idle');
   const [errorUploadPhoto, setErrorUploadPhoto] = useState<string>('');
@@ -136,6 +138,21 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
       setImageUploadState('idle')
     }
   };
+
+  const uploadBanner = async (res: any) => {
+    const currentBanner = bannerProject || '';
+    setBannerProject(res?.url)
+    await supabase
+      .from('projects')
+      .update({
+        banner_url: res?.url,
+        updated_at: new Date()
+      })
+      .eq('id', id)
+    
+    const currentId = currentBanner ? currentBanner.split('/').pop() : null
+    currentBanner && currentId && await deleteImageUploadthing(currentId)
+  }
 
   async function onSubmit(formData: FormData) {
     setSubmitState('loading')
@@ -279,6 +296,53 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
           </div>
           <small className="text-gray-800 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             *Note: changing this image will automatically update the project's thumbnail on public page, also will delete the previous image thumbnail forever
+          </small>
+          {errorUploadPhoto && (
+            <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              {errorUploadPhoto}
+            </small>
+          )}
+        </div>
+        <div className='flex flex-col gap-3 lg:max-w-2xl'>
+          <span className="font-[600]">Project Banner Image</span>
+          <div
+            className="flex flex-col gap-1 w-[300px] items-start"
+            // onMouseEnter={() => setHoverUploadPhoto(true)}
+            // onMouseLeave={() => setHoverUploadPhoto(false)}
+          >
+            {bannerProject && (
+              <img
+                src={bannerProject}
+                // src="https://static.wixstatic.com/media/d9f26d_bfde3c5382e841e290e1026b3784e532~mv2.jpg/v1/fit/w_972,h_548,q_90/d9f26d_bfde3c5382e841e290e1026b3784e532~mv2.webp"
+                alt="Vercel Logo"
+                // fill
+                // className={`dark:invert ${isOverlayInspect && "grayscale"} transition-all duration-500 w-[100%] h-auto`}
+                // width={320}
+                // height={100}
+                // priority
+                className={cn(
+                  "w-[300px] h-[157px] rounded-lg object-cover",
+                  // hoverUploadPhoto && 'brightness-50'
+                )}
+              />
+            )}
+
+            <UploadButton
+              endpoint="imageUploader"
+              onClientUploadComplete={(res) => {
+                // Do something with the response
+                console.log("Files: ", res);
+                uploadBanner(res[0])
+                // alert("Upload Completed");
+              }}
+              onUploadError={(error: Error) => {
+                // Do something with the error.
+                alert(`ERROR! ${error.message}`);
+              }}
+            />
+          </div>
+          <small className="text-gray-800 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            *Note: this image will appear on project detail as a banner image. if you keep this custom banner empty, system will use project thumbnail as a banner image
           </small>
           {errorUploadPhoto && (
             <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
