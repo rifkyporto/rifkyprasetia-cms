@@ -20,6 +20,7 @@ import Link from 'next/link';
 import { Button } from '../ui/button';
 import ModalAddEditShowcase from '../modals/ModalAddEditShowcase';
 import { Icon } from '@iconify/react';
+import ModalDeleteShowcase from '../modals/ModalDeleteShowcase';
 
 const Showcase: React.FC<{ id: string }> = ({ id }) => {
   const [showcases, setShowcases] = React.useState<Partial<ShowcaseType>[]>([]);
@@ -90,7 +91,7 @@ const Showcase: React.FC<{ id: string }> = ({ id }) => {
             className="text-4xl mx-auto my-auto text-[#787878]"
           />
         )}
-        {showcases && (
+        {showcases && showcases.length ? (
           <DragDropContext onDragEnd={onDragEnd}>
             <StrictModeDroppable droppableId="showcase">
             {provided => (
@@ -142,8 +143,9 @@ const Showcase: React.FC<{ id: string }> = ({ id }) => {
                                   {/* <CardTitle>Bab {position! + 1}</CardTitle>
                                   <CardDescription className='truncate'>{link}</CardDescription> */}
                                 </div>
-                                <div className="flex flex-col gap-3">
+                                <div className="flex gap-3">
                                   <ModalAddEditShowcase isEdit data={section} project_id={id} />
+                                  <ModalDeleteShowcase id={id} />
                                   {/* <ModalAddCourseSection isEdit={true} defaultData={section} setCourseSections={setCourseSections} totalLength={courseSections.length} /> */}
                                   
                                 </div>
@@ -164,7 +166,7 @@ const Showcase: React.FC<{ id: string }> = ({ id }) => {
             )}
             </StrictModeDroppable>
           </DragDropContext>
-        )}
+        ) : "No Showcases"}
       </div>
       
     </div>

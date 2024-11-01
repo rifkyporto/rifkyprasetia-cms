@@ -55,7 +55,7 @@ const ModalAddEditShowcase: React.FC<ModalAddEditSocialType> = ({ isEdit, data, 
   const [hoverUploadPhoto, setHoverUploadPhoto] = useState<boolean>(false);
   const [imageUploadState, setImageUploadState] = useState<"loading" | "idle">('idle')
   const [errorUploadPhoto, setErrorUploadPhoto] = useState<string>('');
-  const [coverProject, setCoverProject] = useState<string>('');
+  const [coverProject, setCoverProject] = useState<string>(data?.link || '');
 
   const [linkYoutube, setLinkYoutube] = useState<string>(data?.is_video && data?.link ? data?.link : '');
 
@@ -173,7 +173,9 @@ const ModalAddEditShowcase: React.FC<ModalAddEditSocialType> = ({ isEdit, data, 
         closeButton?.click();
       }
 
-      router.refresh()
+      setTimeout(() => {
+        router.refresh()
+      }, 1000)
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error("Error message:", error.message);

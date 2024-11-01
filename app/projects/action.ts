@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { ShowcaseType } from "@/composables/showcase.types";
 import { IProjectCategories } from "@/composables/project-categories.type";
 import { ProjectDetailType } from "@/composables/project.types";
+import { handleFileDelete } from "@/lib/utils-server";
 
 export async function createProject(formData: FormData) {
   const supabase = createClient();
@@ -287,4 +288,112 @@ export async function upsertCategoryProjectPosition(projects: Partial<IProjectCa
 
   // if (error) throw error;
   // return data
+}
+
+export async function deleteProject(id: string) {
+  const supabase = createClient();
+
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    throw new Error('Not authenticated');
+  }
+
+  // await handleFileDelete(image);
+
+  const { data, error } = await supabase
+    .from('projects')
+    .select(`*`)
+    .eq("id", id)
+
+  if (!data || error) throw new Error('Delete project unsuccessful, please contact the admin.');
+
+  const imageThumbnail = data?.[0]?.cover_image_url;
+
+  if (imageThumbnail) {
+    await handleFileDelete(imageThumbnail);
+  }
+
+  const { data: dataShowcase } = await supabase
+    .from('showcase_project')
+    .select(`*`)
+    .eq("project_id", id)
+
+  if (dataShowcase && dataShowcase.length) {
+    const imageSupabase: string[] = [];
+    dataShowcase.forEach((showcase) => {
+      if (showcase?.link && showcase?.link?.includes("supabase")) {
+        imageSupabase.push(showcase?.link);
+      }
+    })
+
+    if (imageSupabase.length) {
+      await Promise.all(imageSupabase.map( async (image) => {
+        await handleFileDelete(image);
+      }))
+    }
+
+    // // delete bulk all showcase project
+    // await supabase
+    //   .from('showcase_project')
+    //   .delete()
+    //   .eq('project_id', id)
+  }
+
+  const { data: projectCategories } = await supabase
+    .from('project_categories')
+    .select(`*`)
+    .eq("project_id", id)
+
+  
+
+  if (projectCategories?.length) {
+    // delete project categories
+    await supabase
+      .from('project_categories')
+      .delete()
+      .eq('project_id', id)
+  }
+
+  if (dataShowcase && dataShowcase.length) {
+    await supabase
+      .from('showcase_project')
+      .delete()
+      .eq('project_id', id)
+  }
+
+  // delete project
+  await supabase
+    .from('projects')
+    .delete()
+    .eq('id', id)
+}
+
+export async function deleteShowcase(id: string) {
+  const supabase = createClient();
+
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    throw new Error('Not authenticated');
+  }
+
+  const { data: dataShowcase } = await supabase
+    .from('showcase_project')
+    .select(`*`)
+    .eq("id", id)
+
+  if (!dataShowcase || dataShowcase) throw new Error('Delete project unsuccessful, please contact the admin.');
+
+  //@ts-ignore
+  const imageThumbnail = dataShowcase?.[0]?.link;
+
+  if (imageThumbnail && imageThumbnail.includes('supabase')) {
+    await handleFileDelete(imageThumbnail);
+  }
+
+  await supabase
+    .from('showcase_project')
+    .delete()
+    .eq('id', id)
 }

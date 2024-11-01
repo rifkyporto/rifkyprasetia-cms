@@ -24,6 +24,9 @@ import { Button } from "@/components/ui/button"
 import { MultiSelect } from "@/components/ui/multi-select";
 import UploadImage from '../UploadImage';
 import { CategoryDropdownType } from "@/composables/category.types";
+import { Icon } from "@iconify/react";
+import ModalDeleteProject from "../modals/ModalDeleteProject";
+import { handleFileDelete } from "@/lib/utils-client";
 
 interface InformationProp {
   id: string;
@@ -52,7 +55,7 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
     }) || []
   );
   const [coverProject, setCoverProject] = useState<string>(project?.cover_image_url || '');
-  console.log({categoryIds})
+  console.log({coverProject})
   const [hoverUploadPhoto, setHoverUploadPhoto] = useState<boolean>(false);
   const [imageUploadState, setImageUploadState] = useState<"loading" | "idle">('idle');
   const [errorUploadPhoto, setErrorUploadPhoto] = useState<string>('');
@@ -110,12 +113,22 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
         throw new Error(data.error);
       }
 
+      coverProject && await handleFileDelete(coverProject);
+
       const getImage = supabase.storage
       .from(process.env.NEXT_PUBLIC_SUPABASE_BUCKET_STORAGE!)
       .getPublicUrl(data.url).data.publicUrl;
 
       setCoverProject(getImage)
-      setIsEdit(true)
+      await supabase
+        .from('projects')
+        .update({
+          cover_image_url: getImage,
+          updated_at: new Date()
+        })
+        .eq('id', id)
+
+      // setIsEdit(true)
     } catch (error: any) {
       console.error(error.message)
       // alert(error.message);
@@ -230,8 +243,8 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
 
         <hr className='lg:max-w-2xl'/>
         
-        <div className='flex flex-col gap-3'>
-          Project Image
+        <div className='flex flex-col gap-3 lg:max-w-2xl'>
+          <span className="font-[600]">Project Image</span>
           <div
             className="flex gap-4 relative w-[300px] h-[157px]"
             onMouseEnter={() => setHoverUploadPhoto(true)}
@@ -264,6 +277,9 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
               />
             </div>
           </div>
+          <small className="text-gray-800 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            *Note: changing this image will automatically update the project's thumbnail on public page, also will delete the previous image thumbnail forever
+          </small>
           {errorUploadPhoto && (
             <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               {errorUploadPhoto}
@@ -374,6 +390,9 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
           />
         </Label>
       </form>
+      <div className="flex justify-end lg:max-w-2xl">
+        <ModalDeleteProject data={project!} />
+      </div>
     </div>
   )
 }

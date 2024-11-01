@@ -6,6 +6,7 @@ import Link from 'next/link';
 import ModalCreateProject from './modals/ModalCreateProject';
 import SearchInput from "./SearchInputProject";
 import FilterCategoryDropdown from "./FilterCategoryDropdown";
+import { IProjectCategories } from "@/composables/project-categories.type";
 
 const Projects = async ({ searchParams }: { searchParams: { search?: string, type?: string } }) => {
   // const searchQuery = searchParams.search || "";
@@ -28,7 +29,13 @@ const Projects = async ({ searchParams }: { searchParams: { search?: string, typ
     .ilike("category_id", `%${typeQuery}%`)
   console.log({projects})
 
-  const allProjects = projects?.map((project) => {
+  const projectsData: IProjectCategories[] = Object.values(
+    projects!.reduce((acc, item) => {
+        acc[item.project_id] = item;
+        return acc;
+    }, {}));
+
+  const allProjects = projectsData?.map((project) => {
     return project.projects;
   }).sort((a, b) => a.position - b.position)
   console.log({allProjects})
