@@ -13,3 +13,5 @@ export const reorderDragNDrop = (list: Partial<ShowcaseType>[], startIndex: numb
 
   return result;
 };
+
+export const capitalizeFirstLetter = (string: string) => string?.charAt(0).toUpperCase() + string?.slice(1);

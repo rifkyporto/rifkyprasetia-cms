@@ -65,8 +65,10 @@ const Showcase: React.FC<{ id: string }> = ({ id }) => {
           <small>Drag and drop the list below to show it in public page.</small>
         </div>
         
-        {/* <Button variant={'outline'}>Add Showcase</Button> */}
-        <ModalAddEditShowcase project_id={id} />
+        <div className='flex gap-1'>
+          <ModalAddEditShowcase project_id={id} type='photo' />
+          <ModalAddEditShowcase project_id={id} type='video' />
+        </div>
       </div>
       <hr className='lg:max-w-2xl'/>
       {/* 
@@ -111,7 +113,7 @@ const Showcase: React.FC<{ id: string }> = ({ id }) => {
                             <CardHeader>
                               <div className="flex items-center justify-between">
                                 <div className='w-[500px] flex flex-col gap-5'>
-                                  <CardTitle>Showcase {position! + 1}</CardTitle>
+                                  <CardTitle>Showcase {idx! + 1}</CardTitle>
                                   {is_video ? (
                                     // <iframe
                                     //   title="iframe-module"
@@ -139,22 +141,13 @@ const Showcase: React.FC<{ id: string }> = ({ id }) => {
                                   ) : (
                                     <img src={link} alt="" />
                                   )}
-                                  
-                                  {/* <CardTitle>Bab {position! + 1}</CardTitle>
-                                  <CardDescription className='truncate'>{link}</CardDescription> */}
                                 </div>
                                 <div className="flex gap-3">
-                                  <ModalAddEditShowcase isEdit data={section} project_id={id} />
-                                  <ModalDeleteShowcase id={id} />
-                                  {/* <ModalAddCourseSection isEdit={true} defaultData={section} setCourseSections={setCourseSections} totalLength={courseSections.length} /> */}
-                                  
+                                  <ModalAddEditShowcase isEdit data={section} project_id={id} type={section?.is_video ? 'video' : 'photo'} />
+                                  <ModalDeleteShowcase id={section.id!} />                                  
                                 </div>
                               </div>
                             </CardHeader>
-                            {/* <CardFooter className="flex flex-col items-start">
-                              <span className="text-sm text-gray-400">Created At: {moment(createdDate).format("DD MMMM YYYY HH:mm")} </span>
-                              <span className="text-sm text-gray-400">Updated At: {moment(updatedDate).format("DD MMMM YYYY HH:mm")} </span>
-                            </CardFooter> */}
                           </Card>
                         </li>
                       )}

@@ -382,8 +382,8 @@ export async function deleteShowcase(id: string) {
     .from('showcase_project')
     .select(`*`)
     .eq("id", id)
-
-  if (!dataShowcase || dataShowcase) throw new Error('Delete project unsuccessful, please contact the admin.');
+  console.log({dataShowcase})
+  if (!dataShowcase || !dataShowcase.length) throw new Error('Delete project unsuccessful, please contact the admin.');
 
   //@ts-ignore
   const imageThumbnail = dataShowcase?.[0]?.link;

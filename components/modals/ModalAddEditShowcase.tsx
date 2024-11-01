@@ -1,7 +1,7 @@
 "use client";
 import { createClient } from "@/utils/supabase/client";
 import React, { useEffect, useState, ChangeEvent } from 'react'
-import { cn } from '@/lib/utils';
+import { capitalizeFirstLetter, cn } from '@/lib/utils';
 import { useToast } from '../ui/toast';
 import { useRouter } from 'next/navigation';
 import { socialAction } from '@/app/social/action';
@@ -35,22 +35,21 @@ import { ErrorInputTag } from '@/composables/validation.types';
 import { Social } from '@/composables/social.types';
 import UploadImage from '../UploadImage';
 import { ShowcaseType } from "@/composables/showcase.types";
+import { handleFileDelete } from "@/lib/utils-client";
 
 interface ModalAddEditSocialType {
   isEdit?: boolean;
   data?: Partial<ShowcaseType>;
   project_id: string;
+  type: "photo" | "video"
 }
-const ModalAddEditShowcase: React.FC<ModalAddEditSocialType> = ({ isEdit, data, project_id }) => {
+const ModalAddEditShowcase: React.FC<ModalAddEditSocialType> = ({ isEdit, data, project_id, type }) => {
   const { toast } = useToast()
   const supabase = createClient();
   const router = useRouter()
   const [errorFeedback, setErrorFeedback] = useState<ErrorInputTag[]>([])
   const [isMounted, setIsMounted] = useState(false);
   const [loadingState, setLoadingState] = useState<'loading'|'idle'>('idle');
-  const [showcaseType, setShowcaseType] = useState<string>(
-    data?.is_video === true ? 'video' : 'photo'
-  );
 
   const [hoverUploadPhoto, setHoverUploadPhoto] = useState<boolean>(false);
   const [imageUploadState, setImageUploadState] = useState<"loading" | "idle">('idle')
@@ -114,7 +113,23 @@ const ModalAddEditShowcase: React.FC<ModalAddEditSocialType> = ({ isEdit, data, 
       .from(process.env.NEXT_PUBLIC_SUPABASE_BUCKET_STORAGE!)
       .getPublicUrl(data.url).data.publicUrl;
 
-      setCoverProject(getImage)
+      if (isEdit) {
+        await handleFileDelete(coverProject);
+        await supabase
+          .from('projects')
+          .update({
+            cover_image_url: getImage,
+            updated_at: new Date()
+          })
+          .eq('id', data?.id)
+
+        setCoverProject(getImage)
+      } else {
+        setCoverProject(getImage)
+        const formData = new FormData();
+        await onSubmit(formData, getImage);
+      }
+
     } catch (error: any) {
       console.error(error.message)
       // alert(error.message);
@@ -123,31 +138,31 @@ const ModalAddEditShowcase: React.FC<ModalAddEditSocialType> = ({ isEdit, data, 
     }
   };
 
-  const onSubmit = async (formData: FormData) => {
+  const onSubmit = async (formData: FormData, linkImage?: string) => {
     try {
       setLoadingState('loading');
       const errors = [];
       const closeButton = document.getElementById("close-modal-showcase");
       const link = formData.get('link') as string;
 
-      if (!link && showcaseType === 'video') {
+      if (!link && type === 'video') {
         errors.push({ message: 'Showcase link is required', id: 'link' });
       }
-      if (!coverProject && showcaseType === 'photo') {
+      if (!linkImage && type === 'photo') {
         errors.push({ message: 'Showcase photo is required', id: 'link' });
       }
-      if (!showcaseType) {
+      if (!type) {
         errors.push({ message: 'Showcase type is required', id: 'showcaseType' });
       }
-      console.log({showcaseType, link})
+      console.log({type, link})
       if (errors.length) {
         console.log("error", errors)
         setErrorFeedback(errors);
         return
       }
 
-      if (showcaseType === 'photo') formData.set('link', coverProject)
-      formData.set('showcaseType', showcaseType)
+      if (type === 'photo' && linkImage) formData.set('link', linkImage)
+      formData.set('showcaseType', type)
       formData.set('project_id', project_id)
 
       setErrorFeedback([]);
@@ -201,17 +216,21 @@ const ModalAddEditShowcase: React.FC<ModalAddEditSocialType> = ({ isEdit, data, 
       <DialogTrigger>
         {isEdit ? 
           <Icon icon="lucide:edit" className='text-xl cursor-pointer' />
-          : <><Button variant={"outline"}>Add Showcase</Button></>
+          : <>
+              <Button variant={"outline"}>
+                <Icon icon={type === 'video' ? 'fluent:video-clip-20-regular' : 'tabler:photo'} className="text-2xl" />
+              </Button>
+            </>
         }
       </DialogTrigger>
       <DialogContent className='min-w-[700px]'>
         <DialogHeader>
-          <DialogTitle>{isEdit ? "Edit" : "Create"} Showcase</DialogTitle>
+          <DialogTitle>{isEdit ? "Edit" : "Create"} Showcase {capitalizeFirstLetter(type)}</DialogTitle>
         </DialogHeader>
         <hr />
         <form action={onSubmit}>
           <div className='flex flex-col gap-5'>
-            <Label className='flex flex-col gap-2'>
+            {/* <Label className='flex flex-col gap-2'>
               Showcase Type
               <Select onValueChange={(val) => setShowcaseType(val)} defaultValue={showcaseType}>
                 <SelectTrigger className="lg:max-w-2xl outline-none focus:shadow-outline p-2 placeholder:text-gray-400 flex">
@@ -227,8 +246,8 @@ const ModalAddEditShowcase: React.FC<ModalAddEditSocialType> = ({ isEdit, data, 
                   {errorFeedback.find((err) => err.id === "showcaseType")?.message }
                 </small>
               )}
-            </Label>
-            {showcaseType === 'video' && (
+            </Label> */}
+            {type === 'video' && (
               <>
                 <Label className='flex flex-col gap-2'>
                   Link Showcase
@@ -239,21 +258,9 @@ const ModalAddEditShowcase: React.FC<ModalAddEditSocialType> = ({ isEdit, data, 
                     </small>
                   )}
                 </Label>
-                {/* {linkYoutube && (
-                  <iframe
-                    width="500"
-                    height="300"
-                    src={`${linkYoutube}?rel=0`}
-                    title="YouTube video player"
-                    frameBorder="0"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerPolicy="strict-origin-when-cross-origin"
-                    allowFullScreen
-                    className='m-0'
-                  ></iframe>
-                )} */}
               </>
             )}
-            {showcaseType === 'photo' && (
+            {type === 'photo' && (
               <div className='flex flex-col gap-2'>
                 <p className='text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70'>Showcase Photo</p>
                 <div
@@ -300,15 +307,17 @@ const ModalAddEditShowcase: React.FC<ModalAddEditSocialType> = ({ isEdit, data, 
               </div>
             )}
           </div>
-          <DialogFooter className='mt-5'>
-            <DialogClose asChild className='hidden'>
-              <Button id='close-modal-showcase'>close</Button>
-            </DialogClose>
-            <DialogClose asChild>
-              <Button variant={'outline'}>Cancel</Button>
-            </DialogClose>
-            <Button type='submit' disabled={loadingState === 'loading'}>{loadingState === 'loading' ? "Saving..." : "Save"}</Button>
-          </DialogFooter>
+          <DialogClose asChild className='hidden'>
+            <Button id='close-modal-showcase'>close</Button>
+          </DialogClose>
+          {type === "video" && (
+            <DialogFooter className='mt-5'>
+              <DialogClose asChild>
+                <Button variant={'outline'}>Cancel</Button>
+              </DialogClose>
+              <Button type='submit' disabled={loadingState === 'loading'}>{loadingState === 'loading' ? "Saving..." : "Save"}</Button>
+            </DialogFooter>
+          )}
         </form>
         
       </DialogContent>
