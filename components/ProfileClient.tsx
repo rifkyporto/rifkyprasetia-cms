@@ -32,6 +32,7 @@ const ProfileClient = ({ profile }: { profile: IProfile }) => {
       const email = formData.get('email') as string;
       const mobile = formData.get('mobile') as string;
       const about = formData.get('about') as string;
+      const copyright = formData.get('copyright') as string;
 
       if (!display_name) {
         errors.push({ message: 'Name is required', id: 'display_name' });
@@ -44,6 +45,9 @@ const ProfileClient = ({ profile }: { profile: IProfile }) => {
       }
       if (!about) {
         errors.push({ message: '"About" description is required', id: 'about' });
+      }
+      if (!copyright) {
+        errors.push({ message: 'Copyright is required', id: 'copyright' });
       }
 
       if (errors.length) {
@@ -60,7 +64,8 @@ const ProfileClient = ({ profile }: { profile: IProfile }) => {
             display_name,
             email,
             mobile,
-            about
+            about,
+            copyright
           })
           .select();
 
@@ -75,7 +80,8 @@ const ProfileClient = ({ profile }: { profile: IProfile }) => {
             display_name,
             email,
             mobile,
-            about
+            about,
+            copyright
           })
           .eq('id', profile?.id).select()
 
@@ -225,6 +231,36 @@ const ProfileClient = ({ profile }: { profile: IProfile }) => {
         {errorFeedback?.find((err) => err.id === "about") && (
           <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             {errorFeedback?.find((err) => err.id === "about")?.message}
+          </small>
+        )}
+      </Label>
+      <Label className='flex flex-col gap-3'>
+        Copyright
+        {/* <div className='flex gap-1'>
+          <Input className='' defaultValue={''}><p>&copy;</p></Input>
+          <Input
+            id='copyright'
+            name='copyright'
+            placeholder='Enter your copyright footer'
+            className='lg:max-w-2xl'
+            defaultValue={profileData?.copyright}
+          />
+        </div> */}
+        <div className="relative lg:max-w-2xl">
+          <div className="absolute left-3 top-1/2 -translate-y-1/2" dangerouslySetInnerHTML={{ __html: '&copy;' }} />
+          <Input
+            className="pl-8"
+            // defaultValue=""
+            id='copyright'
+            name='copyright'
+            placeholder='Enter your copyright footer'
+            // className='lg:max-w-2xl'
+            defaultValue={profileData?.copyright}
+          />
+        </div>
+        {errorFeedback?.find((err) => err.id === "copyright") && (
+          <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            {errorFeedback?.find((err) => err.id === "copyright")?.message}
           </small>
         )}
       </Label>
