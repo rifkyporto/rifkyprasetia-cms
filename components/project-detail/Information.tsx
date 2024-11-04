@@ -305,11 +305,7 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
         </div>
         <div className='flex flex-col gap-3 lg:max-w-2xl'>
           <span className="font-[600]">Project Banner Image</span>
-          <div
-            className="flex flex-col gap-1 w-[300px] items-start"
-            // onMouseEnter={() => setHoverUploadPhoto(true)}
-            // onMouseLeave={() => setHoverUploadPhoto(false)}
-          >
+          <div className="flex flex-col gap-1 w-[300px] items-start">
             {bannerProject && (
               <img
                 src={bannerProject}

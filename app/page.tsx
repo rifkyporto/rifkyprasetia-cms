@@ -9,6 +9,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Projects from "@/components/Projects";
 import Categories from "@/components/Categories";
 import Socials from "@/components/Socials";
+import Profile from "@/components/Profile";
 
 export const dynamic = "force-dynamic";
 
@@ -22,6 +23,7 @@ export default async function Index({ searchParams }: { searchParams: { search?:
           <TabsTrigger value="project">Project</TabsTrigger>
           <TabsTrigger value="category">Category</TabsTrigger>
           <TabsTrigger value="socials">Socials</TabsTrigger>
+          <TabsTrigger value="profile">Profile</TabsTrigger>
         </TabsList>
         <TabsContent value="project">
           <Projects searchParams={searchParams} />
@@ -31,6 +33,9 @@ export default async function Index({ searchParams }: { searchParams: { search?:
         </TabsContent>
         <TabsContent value="socials">
           <Socials />
+        </TabsContent>
+        <TabsContent value="profile">
+          <Profile />
         </TabsContent>
       </Tabs>
       </div>
