@@ -17,6 +17,8 @@ export async function socialAction(formData: FormData) {
   const id = formData.get('id') as string;
   const socialKey = formData.get('key') as string;
   const link = formData.get('link') as string;
+  const username = formData.get('username') as string;
+
   console.log({socialKey, userId})
   const { data: checkKey } = await supabase
     .from('social')
@@ -39,7 +41,7 @@ export async function socialAction(formData: FormData) {
     const { data, error } = await supabase
       .from('social')
       .update({
-        key: socialKey, link: link
+        key: socialKey, link, username
       })
       .eq('id', id);
 
@@ -52,6 +54,7 @@ export async function socialAction(formData: FormData) {
       key: socialKey,
       link: link,
       user_id: userId,
+      username
     });
 
     if (error) throw error;

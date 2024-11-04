@@ -21,7 +21,7 @@ const Socials = async () => {
   const supabase = createClient();
   const { data: socials, error } = await supabase
     .from('social') // Adjust this to your table name
-    .select('id, key, link')
+    .select('id, key, link, username')
     // .eq("user_id", `${process.env.NEXT_PUBLIC_SUPABASE_USER_ID}`)
 
     return (
@@ -42,6 +42,7 @@ const Socials = async () => {
           <TableRow>
             <TableHead>Socials</TableHead>
             <TableHead>Link</TableHead>
+            <TableHead>Username</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
@@ -58,8 +59,11 @@ const Socials = async () => {
                     )}
                   />
                 </TableCell>
-                <TableCell className='min-w-[90%]'>
+                <TableCell className='min-w-[30%]'>
                   {social.link}
+                </TableCell>
+                <TableCell className='min-w-[30%]'>
+                  {social.username}
                 </TableCell>
                 <TableCell>
                   <ModalAddEditSocial isEdit data={social}/>

@@ -12,6 +12,15 @@ import { ErrorInputTag } from '@/composables/validation.types';
 import { isValidEmail } from '@/lib/utils';
 import { UploadButton } from '@/utils/uploadthing';
 import { deleteImageUploadthing } from '@/app/projects/action';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 
 const ProfileClient = ({ profile }: { profile: IProfile }) => {
   const supabase = createClient();
@@ -205,14 +214,21 @@ const ProfileClient = ({ profile }: { profile: IProfile }) => {
         )}
       </Label>
       <Label className='flex flex-col gap-3'>
-        Social Media Contact
-        <Input
-          id='title'
-          name='title'
-          placeholder='Enter your phone number'
-          className='lg:max-w-2xl'
-          // defaultValue={project?.title}
-        />
+        Social Media Profile
+        <Select>
+          <SelectTrigger className="lg:max-w-2xl">
+            <SelectValue placeholder="Select your social media" />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectGroup>
+              <SelectItem value="apple">Apple</SelectItem>
+              <SelectItem value="banana">Banana</SelectItem>
+              <SelectItem value="blueberry">Blueberry</SelectItem>
+              <SelectItem value="grapes">Grapes</SelectItem>
+              <SelectItem value="pineapple">Pineapple</SelectItem>
+            </SelectGroup>
+          </SelectContent>
+        </Select>
         {/* {errorFeedback?.find((err) => err.id === "title") && (
           <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             {errorFeedback?.find((err) => err.id === "title")?.message}
