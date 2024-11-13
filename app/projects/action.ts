@@ -29,8 +29,9 @@ export async function createProject(formData: FormData) {
   const year = formData.get('year') as string;
   const linkTeaser = formData.get('linkTeaser') as string;
   const coverImageUrl = formData.get('coverImageUrl') as string;
-
   const categoryIdsParsed: string[] = JSON.parse(categoryIds);
+
+  const additionalFields = formData.get('additional_fields') as string;
 
   if (id) {
     const { data, error } = await supabase
@@ -43,7 +44,8 @@ export async function createProject(formData: FormData) {
         date_month_project: `${month} ${year}`,
         link_teaser: linkTeaser,
         user_id: userId,
-        cover_image_url: coverImageUrl
+        cover_image_url: coverImageUrl,
+        additional_fields: additionalFields
       })
       .eq('id', id);
 
@@ -112,7 +114,8 @@ export async function createProject(formData: FormData) {
         date_month_project: `${month} ${year}`,
         link_teaser: linkTeaser,
         user_id: userId,
-        cover_image_url: coverImageUrl
+        cover_image_url: coverImageUrl,
+        additional_fields: additionalFields
       })
       .select();
     console.log({created: data})

@@ -28,6 +28,7 @@ import { Icon } from "@iconify/react";
 import ModalDeleteProject from "../modals/ModalDeleteProject";
 import { handleFileDelete } from "@/lib/utils-client";
 import { UploadButton } from "@/utils/uploadthing";
+import { nanoid } from "nanoid";
 
 interface InformationProp {
   id: string;
@@ -66,6 +67,10 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
   const [errorFeedback, setErrorFeedback] = useState<ErrorInputTag[]>([]);
   const [submitState, setSubmitState] = useState<'loading' | 'idle'>('idle');
 
+  const [additionalFields, setAdditionalFields] = useState<{ id: string, label: string, value: string }[]>(
+    project?.additional_fields ? JSON.parse(project?.additional_fields) : []
+  )
+  const [additionalLabel, setAdditionalLabel] = useState<string>("")
 
   const handleCancel = (e: any) => {
     e.preventDefault()
@@ -225,6 +230,7 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
     formData.set('month', month);
     formData.set('year', year);
     formData.set('coverImageUrl', coverProject);
+    formData.set('additional_fields', JSON.stringify(additionalFields))
 
     try {
       await createProject(formData);
@@ -246,7 +252,7 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
       setIsEdit(false);
     }
   }
-
+  console.log({additionalFields})
   return (
     <div className='flex flex-col w-full gap-5'>
       <form action={onSubmit} ref={formRef} className='flex flex-col w-full gap-5'>
@@ -449,8 +455,71 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
             onChange={() => !isEdit && setIsEdit(true)}
           />
         </Label>
+        <hr />
+        <h2 className="text-xl">Additional Field</h2>
+        {additionalFields?.map((addition, idx) => {
+          return (
+            <div className="flex flex-col gap-2 lg:max-w-2xl">
+              <Label key={idx} className='flex flex-col gap-3'>{addition?.label}</Label>
+              <div className="w-full flex gap-2">
+                <Input
+                  id={addition?.label}
+                  name={addition?.label}
+                  placeholder={`Enter ${addition?.label}`}
+                  className='w-full'
+                  defaultValue={addition?.value || ""}
+                  onChange={(e) => {
+                    !isEdit && setIsEdit(true)
+                    const mapAddition = additionalFields?.map((add) => {
+                      if (add.id === addition.id) {
+                        return {
+                          ...add,
+                          value: e?.target?.value
+                        }
+                      }
+                      
+                      return add
+                    })
+                    setAdditionalFields(mapAddition)
+                  }}
+                />
+                <Button
+                  variant={'destructive'}
+                  type="button"
+                  className=""
+                  onClick={() => {
+                    const filteredAdditionals = additionalFields?.filter((additionData) => {
+                      return additionData.id !== addition.id
+                    })
+
+                    setAdditionalFields(filteredAdditionals || [])
+                    console.log({filteredAdditionals})
+                  }}
+                >
+                  <Icon icon="tabler:trash" className="text-xl"/>
+                </Button>
+              </div>
+            </div>
+          )
+        })}
+        <div className="flex gap-2 lg:max-w-2xl">
+          <Input 
+            className="w-full"
+            onChange={(e) => setAdditionalLabel(e?.target?.value)}
+            value={additionalLabel}
+            placeholder="Add new label"
+          />
+          <Button
+            type="button"
+            className="w-full"
+            onClick={() => {
+              setAdditionalFields([...additionalFields, { id: nanoid(), label: additionalLabel, value: "" }])
+              setAdditionalLabel("")
+            }}
+          >+</Button>
+        </div>
       </form>
-      <div className="flex justify-end lg:max-w-2xl">
+      <div className="flex justify-end lg:max-w-2xl my-5">
         <ModalDeleteProject data={project!} />
       </div>
     </div>

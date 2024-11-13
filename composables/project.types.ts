@@ -13,6 +13,7 @@ export type ProjectDetailType = {
   position: number;
   created_at: Date;
   updated_at: Date;
+  additional_fields: string;
 
   project_categories: IProjectCategories[];
 }

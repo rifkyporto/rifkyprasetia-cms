@@ -1,4 +1,5 @@
 import React from 'react'
+import dynamic from 'next/dynamic';
 import { createClient } from '@/utils/supabase/server';
 import Layout from '@/components/Layout'
 import {
@@ -14,8 +15,9 @@ import { cn } from '@/lib/utils'
 import Link from "next/link"
 import { Button, buttonVariants } from "@/components/ui/button"
 import ButtonSidebar from '@/components/project-detail/ButtonSidebar'
+const Information = dynamic(() => import("@/components/project-detail/Information"), { ssr: false });
 
-import Information from '@/components/project-detail/Information';
+// import Information from '@/components/project-detail/Information';
 import Showcase from '@/components/project-detail/Showcase';
 
 interface PageProps {
@@ -23,8 +25,8 @@ interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export const dynamic = "force-dynamic";
-
+// export const dynamic = "force-dynamic";
+export const revalidate = 0
 const ProjectDetail: React.FC<PageProps> = async ({ params, searchParams }) => {
   const supabase = createClient();
   const id = params.id;
