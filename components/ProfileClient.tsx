@@ -128,7 +128,7 @@ const ProfileClient = ({ profile, socials }: { profile: IProfile, socials: Socia
       
       // console.log({unselectedSocialMedia, selectedSocialMedia})
 
-      let newArray: React.SetStateAction<Social[]> = [];
+      let newArray: Social[] = [];
 
       rawSocials?.forEach( async (social) => {
         const isShow = selectedSocialMedia?.find((socialSelected) => socialSelected?.id === social?.id)
