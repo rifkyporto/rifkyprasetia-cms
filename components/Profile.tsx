@@ -17,6 +17,10 @@ const Profile = async () => {
     .from('profile') // Adjust this to your table name
     .select('*')
     .eq("id", `${process.env.NEXT_PUBLIC_SUPABASE_USER_ID}`)
+  const { data: socialData, error: errorSocial } = await supabase
+    .from('social') // Adjust this to your table name
+    .select('*')
+    // .eq("id", `${process.env.NEXT_PUBLIC_SUPABASE_USER_ID}`)
   console.log({profile})
   return (
     <>
@@ -30,7 +34,7 @@ const Profile = async () => {
         <hr className="w-full" />
       </div>
       
-      <ProfileClient profile={profile?.[0]} />
+      <ProfileClient profile={profile?.[0]} socials={socialData || []} />
     </>
   )
 }

@@ -8,8 +8,9 @@ import { Input } from './ui/input';
 import { Textarea } from './ui/textarea';
 import { Button } from './ui/button';
 import { IProfile } from '@/composables/profile.types';
+import { Social } from '@/composables/social.types';
 import { ErrorInputTag } from '@/composables/validation.types';
-import { isValidEmail } from '@/lib/utils';
+import { capitalizeFirstLetter, isValidEmail } from '@/lib/utils';
 import { UploadButton } from '@/utils/uploadthing';
 import { deleteImageUploadthing } from '@/app/projects/action';
 import {
@@ -21,16 +22,27 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
+import { MultiSelect } from './ui/multi-select';
 
-const ProfileClient = ({ profile }: { profile: IProfile }) => {
+const ProfileClient = ({ profile, socials }: { profile: IProfile, socials: Social[] }) => {
   const supabase = createClient();
   const { toast } = useToast()
   const [errorFeedback, setErrorFeedback] = useState<ErrorInputTag[]>([]);
+  const [rawSocials, setRawSocials] = useState<Social[]>(socials || [])
   const [profileData, setProfileData] = useState<IProfile>(profile);
+  const [socialList, setSocialList] = useState<{ label: string, value: string }[]>(
+    socials?.map((social) => {
+      return {
+        label: capitalizeFirstLetter(social?.key),
+        value: social?.key
+      }
+    })
+  )
+  const [selectedSocial, setSelectedSocial] = useState<Social[]>(socials?.filter(social => social.is_show_contact_page === true))
   const [profileImg, setProfileImg] = useState<string | ''>(profile?.profile_img || '')
   const [loadingSubmit, setLoadingSubmit] = React.useState<'loading' | 'idle'>('idle');
   const [errorUploadPhoto, setErrorUploadPhoto] = useState<string>('');
-
+  console.log({socials, selectedSocial})
   const onSubmit = async (formData: FormData) => {
     try {
       setLoadingSubmit('loading');
@@ -64,6 +76,14 @@ const ProfileClient = ({ profile }: { profile: IProfile }) => {
         setErrorFeedback(errors);
         return
       }
+
+      // const selectedSocialMedia = [...selectedSocial];
+      // const unselectedSocialMedia = rawSocials?.filter((rawsocial => {
+      //   const findSelected = selectedSocialMedia?.find(selected => selected?.id === rawsocial?.id)
+      //   return !findSelected
+      // }))
+      // console.log({selectedSocialMedia, unselectedSocialMedia})
+      // return
 
       if (!profile) {
         const { data, error } = await supabase
@@ -99,6 +119,33 @@ const ProfileClient = ({ profile }: { profile: IProfile }) => {
           title: "Success edit profile data",
         })
       }
+
+      const selectedSocialMedia = [...selectedSocial];
+      // const unselectedSocialMedia = rawSocials?.filter((rawsocial => {
+      //   const findSelected = selectedSocialMedia?.find(selected => selected?.id === rawsocial?.id)
+      //   return !findSelected
+      // }))
+      
+      // console.log({unselectedSocialMedia, selectedSocialMedia})
+
+      let newArray: React.SetStateAction<Social[]> = [];
+
+      rawSocials?.forEach( async (social) => {
+        const isShow = selectedSocialMedia?.find((socialSelected) => socialSelected?.id === social?.id)
+        newArray.push({
+          ...social,
+          is_show_contact_page: Boolean(isShow)
+        })
+
+        const { data, error } = await supabase
+          .from('social')
+          .update({
+            is_show_contact_page: Boolean(isShow),
+          })
+          .eq('id', social?.id).select()
+      })
+
+      setRawSocials(newArray)
     } catch (error) {
       console.error(error)
       toast({
@@ -124,6 +171,13 @@ const ProfileClient = ({ profile }: { profile: IProfile }) => {
     currentBanner && currentId && await deleteImageUploadthing(currentId)
   }
 
+  const frameworksList = [
+    { value: "react", label: "React" },
+    { value: "angular", label: "Angular" },
+    { value: "vue", label: "Vue" },
+    { value: "svelte", label: "Svelte" },
+    { value: "ember", label: "Ember" },
+  ];
   return (
     <form action={onSubmit} className='flex flex-col w-full gap-5'>
       <div className='flex flex-col gap-3 lg:max-w-2xl'>
@@ -215,20 +269,23 @@ const ProfileClient = ({ profile }: { profile: IProfile }) => {
       </Label>
       <Label className='flex flex-col gap-3'>
         Social Media Profile
-        <Select>
-          <SelectTrigger className="lg:max-w-2xl">
-            <SelectValue placeholder="Select your social media" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectGroup>
-              <SelectItem value="apple">Apple</SelectItem>
-              <SelectItem value="banana">Banana</SelectItem>
-              <SelectItem value="blueberry">Blueberry</SelectItem>
-              <SelectItem value="grapes">Grapes</SelectItem>
-              <SelectItem value="pineapple">Pineapple</SelectItem>
-            </SelectGroup>
-          </SelectContent>
-        </Select>
+        <MultiSelect
+          options={socialList!}
+          onValueChange={(val) => {
+            // setCategoryIds(val);
+            // !isEdit && setIsEdit(true)
+            console.log({val})
+            // @ts-ignore
+            setSelectedSocial(val?.map((social => rawSocials?.find(dataSocial => dataSocial?.key === social))))
+            // setSelectedSocial([...selectedSocial, socials?.find(social => social.key === val)!])
+          }}
+          defaultValue={rawSocials?.filter(social => social?.is_show_contact_page === true)?.map((social) => social?.key)}
+          placeholder="Select Socials"
+          variant="inverted"
+          animation={2}
+          maxCount={3}
+          className="lg:max-w-2xl"
+        />
         {/* {errorFeedback?.find((err) => err.id === "title") && (
           <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
             {errorFeedback?.find((err) => err.id === "title")?.message}
