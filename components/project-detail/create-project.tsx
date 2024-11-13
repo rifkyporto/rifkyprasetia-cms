@@ -298,6 +298,17 @@ const CreateProject: React.FC<InformationProp> = ({ categories }) => {
           )}
         </Label>
         <Label className='flex flex-col gap-3'>
+          Project Category Label
+          <Input
+            id='categoryLabel'
+            name='categoryLabel'
+            placeholder='Enter category project label'
+            className='lg:max-w-2xl'
+            // defaultValue={project?.category_label}
+            // onChange={() => !isEdit && setIsEdit(true)}
+          />
+        </Label>
+        <Label className='flex flex-col gap-3'>
           Role
           <Input
             id="role"

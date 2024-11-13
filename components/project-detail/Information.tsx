@@ -381,6 +381,20 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
           />
         </Label>
         <Label className='flex flex-col gap-3'>
+          Project Category Label
+          <Input
+            id='categoryLabel'
+            name='categoryLabel'
+            placeholder='Enter category project label'
+            className='lg:max-w-2xl'
+            defaultValue={project?.category_label}
+            onChange={() => !isEdit && setIsEdit(true)}
+          />
+          <small className="text-gray-800 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+            *Note: if category label is filled, it will override the exact project category on project detail information
+          </small>
+        </Label>
+        <Label className='flex flex-col gap-3'>
           Role
           <Input
             id="role"
