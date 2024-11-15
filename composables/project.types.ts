@@ -15,6 +15,8 @@ export type ProjectDetailType = {
   created_at: Date;
   updated_at: Date;
   additional_fields: string;
+  banner_Yaxis: number;
+  banner_Xaxis: number;
 
   project_categories: IProjectCategories[];
 }

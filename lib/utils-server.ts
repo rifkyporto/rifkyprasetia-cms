@@ -79,3 +79,15 @@ export const handleFileDelete = async (fileUrl: string) => {
     console.log('URL is not from Supabase storage');
   }
 };
+
+export const revalidatePage = async (path: string) => {
+  const responseRevalidate = await fetch(`https://rifkyprasetia-portfolio.vercel.app/api/revalidate?path=${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  const responseRevalidateJson = await responseRevalidate.json()
+  console.log({responseRevalidateJson})
+}

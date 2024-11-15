@@ -23,12 +23,15 @@ import { ErrorInputTag } from "@/composables/validation.types";
 import { Button } from "@/components/ui/button"
 import { MultiSelect } from "@/components/ui/multi-select";
 import UploadImage from '../UploadImage';
+import { Slider } from "@/components/ui/slider"
 import { CategoryDropdownType } from "@/composables/category.types";
 import { Icon } from "@iconify/react";
 import ModalDeleteProject from "../modals/ModalDeleteProject";
 import { handleFileDelete } from "@/lib/utils-client";
 import { UploadButton } from "@/utils/uploadthing";
 import { nanoid } from "nanoid";
+import { Card, CardContent } from "../ui/card";
+import ModalPreviewBannerProject from "../modals/ModalPreviewBannerProject";
 
 interface InformationProp {
   id: string;
@@ -61,6 +64,8 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
   const [bannerProject, setBannerProject] = useState<string>(project?.banner_url || '');
   const [hoverUploadPhoto, setHoverUploadPhoto] = useState<boolean>(false);
   const [imageUploadState, setImageUploadState] = useState<"loading" | "idle">('idle');
+  const [bannerX, setBannerX] = useState<number>(project?.banner_Xaxis || 50);
+  const [bannerY, setBannerY] = useState<number>(project?.banner_Yaxis || 50);
   const [errorUploadPhoto, setErrorUploadPhoto] = useState<string>('');
 
   const formRef = useRef<HTMLFormElement>(null);
@@ -231,7 +236,8 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
     formData.set('year', year);
     formData.set('coverImageUrl', coverProject);
     formData.set('additional_fields', JSON.stringify(additionalFields))
-
+    formData.set('banner_Xaxis', String(bannerX));
+    formData.set('banner_Yaxis', String(bannerY));
     try {
       await createProject(formData);
       toast({
@@ -352,6 +358,51 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
             </small>
           )}
         </div>
+        <Label className='flex flex-col gap-3 lg:max-w-2xl'>
+          Banner Point Of Interest
+          <Card className="flex flex-col gap-2">
+            <CardContent className="p-5 flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
+                <p className="flex gap-5 items-center">
+                  X Axis
+                  <span className="italic text-sm text-gray-400">{bannerX}% from left (0%) to right (100%)</span>
+                </p>
+                <Slider
+                  defaultValue={[bannerX]}
+                  max={100}
+                  step={1}
+                  onChange={((e) => {
+                    {/* @ts-ignore */}
+                    setBannerX(e.target?.value)
+                    !isEdit && setIsEdit(true)
+                  })}
+                />
+              </div>
+              <div className="flex flex-col gap-2">
+                <p className="flex gap-5 items-center">
+                  Y Axis
+                  <span className="italic text-sm text-gray-400">{bannerY}% from top (0%) to bottom (100%)</span>
+                </p>
+                <Slider
+                  defaultValue={[bannerY]}
+                  max={100}
+                  step={1}
+                  onChange={((e) => {
+                    {/* @ts-ignore */}
+                    setBannerY(e.target?.value)
+                    !isEdit && setIsEdit(true)
+                  })}
+                />
+              </div>
+              {/* <Button type="button" variant={'outline'}>Preview Mobile Banner</Button> */}
+              <div className="w-full flex gap-2">
+                <ModalPreviewBannerProject url={bannerProject || coverProject} bgPosition={`${bannerX}% ${bannerY}%`} device="mobile" />
+                <ModalPreviewBannerProject url={bannerProject || coverProject} bgPosition={`${bannerX}% ${bannerY}%`} device="desktop" />
+              </div>
+            </CardContent>
+          </Card>
+          
+        </Label>
         <Label className='flex flex-col gap-3'>
           Project Name
           <Input

@@ -6,7 +6,7 @@ import { cookies } from "next/headers";
 import { ShowcaseType } from "@/composables/showcase.types";
 import { IProjectCategories } from "@/composables/project-categories.type";
 import { ProjectDetailType } from "@/composables/project.types";
-import { handleFileDelete } from "@/lib/utils-server";
+import { handleFileDelete, revalidatePage } from "@/lib/utils-server";
 
 export async function createProject(formData: FormData) {
   const supabase = createClient();
@@ -33,6 +33,8 @@ export async function createProject(formData: FormData) {
   const categoryIdsParsed: string[] = JSON.parse(categoryIds);
 
   const additionalFields = formData.get('additional_fields') as string;
+  const banner_Xaxis = formData.get('banner_Xaxis') as string || null;
+  const banner_Yaxis = formData.get('banner_Yaxis') as string || null;
 
   if (id) {
     const { data, error } = await supabase
@@ -47,7 +49,9 @@ export async function createProject(formData: FormData) {
         link_teaser: linkTeaser,
         user_id: userId,
         cover_image_url: coverImageUrl,
-        additional_fields: additionalFields
+        additional_fields: additionalFields,
+        banner_Yaxis: Number(banner_Yaxis),
+        banner_Xaxis: Number(banner_Xaxis)
       })
       .eq('id', id);
 
@@ -103,7 +107,20 @@ export async function createProject(formData: FormData) {
       //   console.log({dataPC, error})
       // })
     console.log({data})
+
+    // const responseRevalidate = await fetch(`https://rifkyprasetia-portfolio.vercel.app/api/revalidate?path=/projects/${id}`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    // })
+
+    // const responseRevalidateJson = await responseRevalidate.json()
+    // console.log({responseRevalidateJson})
+
     if (error) throw error;
+
+    await revalidatePage(`/projects/${id}`)
     return data;
   } else {
     const { data, error } = await supabase
@@ -118,7 +135,7 @@ export async function createProject(formData: FormData) {
         link_teaser: linkTeaser,
         user_id: userId,
         cover_image_url: coverImageUrl,
-        additional_fields: additionalFields
+        additional_fields: additionalFields,
       })
       .select();
     console.log({created: data})
@@ -137,6 +154,17 @@ export async function createProject(formData: FormData) {
     
 
     if (error) throw error;
+
+    // const responseRevalidate = await fetch(`https://rifkyprasetia-portfolio.vercel.app/api/revalidate?path=/projects/${data?.[0].id}`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    // })
+
+    // const responseRevalidateJson = await responseRevalidate.json()
+    // console.log({responseRevalidateJson})
+    await revalidatePage(`/projects/${data?.[0].id}`)
     return data;
   }
 }
@@ -191,6 +219,19 @@ export async function showcaseAction(formData: FormData) {
       .eq('id', id)
 
     if (error) throw error;
+
+    const responseRevalidate = await fetch(`https://rifkyprasetia-portfolio.vercel.app/api/revalidate?path=/projects/${project_id}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+    })
+
+    const responseRevalidateJson = await responseRevalidate.json()
+    console.log({responseRevalidateJson})
+
+    await revalidatePage(`/projects/${project_id}`)
+
     return data;
   } else {
     const { count } = await supabase
@@ -209,6 +250,17 @@ export async function showcaseAction(formData: FormData) {
       });
 
     if (error) throw error;
+
+    // const responseRevalidate = await fetch(`https://rifkyprasetia-portfolio.vercel.app/api/revalidate?path=/projects/${project_id}`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    // })
+
+    // const responseRevalidateJson = await responseRevalidate.json()
+    // console.log({responseRevalidateJson})
+    await revalidatePage(`/projects/${project_id}`)
     return data;
   }
 }
@@ -223,6 +275,7 @@ export async function upsertShowcasePosition(showcases: Partial<ShowcaseType>[])
   }
   console.log({session})
   const userId = session.user.id;
+  let project_id = ''
 
   showcases.forEach(async (showcase) => {
     const { data, error } = await supabase
@@ -235,8 +288,11 @@ export async function upsertShowcasePosition(showcases: Partial<ShowcaseType>[])
         updated_at: new Date()
       })
       .eq('id', showcase.id)
+    // @ts-ignore
+    project_id = data?.[0].project_id
   })
 
+  project_id && await revalidatePage(`/projects/${project_id}`)
   // if (error) throw error;
   // return data
 }
@@ -264,6 +320,7 @@ export async function upsertAllProjectPosition(projects: Partial<ProjectDetailTy
       })
       .eq('id', showcase.id)
   })
+  await revalidatePage(`/`)
 
   // if (error) throw error;
   // return data
@@ -279,6 +336,7 @@ export async function upsertCategoryProjectPosition(projects: Partial<IProjectCa
   }
   console.log({session})
   const userId = session.user.id;
+  let routeUrl = ''
 
   projects.forEach(async (showcase) => {
     const { data, error } = await supabase
@@ -291,8 +349,12 @@ export async function upsertCategoryProjectPosition(projects: Partial<IProjectCa
         updated_at: new Date()
       })
       .eq('id', showcase.id)
+
+    // @ts-ignore
+    routeUrl = data?.[0]?.category_id
   })
 
+  await revalidatePage(`/${routeUrl}`)
   // if (error) throw error;
   // return data
 }
@@ -374,6 +436,9 @@ export async function deleteProject(id: string) {
     .from('projects')
     .delete()
     .eq('id', id)
+
+  await revalidatePage(`/`)
+  await revalidatePage(`/projects/${id}`)
 }
 
 export async function deleteShowcase(id: string) {
@@ -403,6 +468,8 @@ export async function deleteShowcase(id: string) {
     .from('showcase_project')
     .delete()
     .eq('id', id)
+
+  await revalidatePage(`/projects/${dataShowcase?.[0]?.project_id}`)
 }
 
 export async function deleteImageUploadthing(id: string) {

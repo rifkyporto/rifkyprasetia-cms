@@ -15,8 +15,8 @@ const Projects = async ({ searchParams }: { searchParams: { search?: string, typ
   const { data: projects, error } = await supabase
     .from('projects') // Adjust this to your table name
     .select('*')
-    .ilike("title", `%${searchQuery}%`)
-    .ilike("category_id", `%${typeQuery}%`)
+    // .ilike("title", `%${searchQuery}%`)
+    // .ilike("category_id", `%${typeQuery}%`)
   console.log({projects})
   return (
     <>
