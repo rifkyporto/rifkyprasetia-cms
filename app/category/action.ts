@@ -2,6 +2,7 @@
 
 import { CategoryDropdownType } from "@/composables/category.types";
 import { createClient } from "@/utils/supabase/server";
+import { revalidatePage } from "@/lib/utils-server";
 import { cookies } from "next/headers";
 
 export async function categoryAction(formData: FormData, isEdit: boolean) {
@@ -41,8 +42,29 @@ export async function categoryAction(formData: FormData, isEdit: boolean) {
         updated_at: new Date()
       })
       .eq('slug', slug).select()
+      .select("slug")
     console.log({data})
     if (error) throw error;
+
+    await revalidatePage(`/${slug}`);
+
+    data?.forEach( async (slugs) => {
+      await revalidatePage(`/${slugs?.slug}`);
+    })
+    
+    await revalidatePage(`/contact`);
+    await revalidatePage(`/`);
+    
+    const { data: projects, error: errorProjects } = await supabase
+      .from('projects')
+      .select("id")
+
+    if (projects?.length) {
+      projects.forEach(async (project) => {
+        await revalidatePage(`/projects/${project?.id}`);
+      })
+    }
+
     return data;
   } else {
     const { data, error } = await supabase
@@ -51,9 +73,30 @@ export async function categoryAction(formData: FormData, isEdit: boolean) {
       name,
       ...(slug ? { slug } : { slug: name.toLowerCase().replace(/ /g, '-')}),
       user_id: userId,
-    });
+    })
+    .select("slug");
 
     if (error) throw error;
+
+    await revalidatePage(`/${slug}`);
+
+    data?.forEach( async (slugs) => {
+      await revalidatePage(`/${slugs?.slug}`);
+    })
+
+    await revalidatePage(`/contact`);
+    await revalidatePage(`/`);
+
+    const { data: projects, error: errorProjects } = await supabase
+      .from('projects')
+      .select("id")
+
+    if (projects?.length) {
+      projects.forEach(async (project) => {
+        await revalidatePage(`/projects/${project?.id}`);
+      })
+    }
+
     return data;
   }
 }
@@ -77,5 +120,20 @@ export async function upsertCategoryPosition(categories: Partial<CategoryDropdow
         updated_at: new Date()
       })
       .eq('slug', category.slug)
+
+    await revalidatePage(`/${category?.slug}`);
   })
+
+  await revalidatePage(`/`);
+  await revalidatePage(`/contact`);
+
+  const { data: projects, error: errorProjects } = await supabase
+    .from('projects')
+    .select("id")
+
+  if (projects?.length) {
+    projects.forEach(async (project) => {
+      await revalidatePage(`/projects/${project?.id}`);
+    })
+  }
 }

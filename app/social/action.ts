@@ -2,6 +2,7 @@
 
 import { createClient } from "@/utils/supabase/server";
 import { cookies } from "next/headers";
+import { revalidatePage } from "@/lib/utils-server";
 
 export async function socialAction(formData: FormData) {
   const supabase = createClient();
@@ -11,7 +12,7 @@ export async function socialAction(formData: FormData) {
   if (!session) {
     throw new Error('Not authenticated');
   }
-  console.log({session})
+
   const userId = session.user.id;
 
   const id = formData.get('id') as string;
@@ -58,6 +59,30 @@ export async function socialAction(formData: FormData) {
     });
 
     if (error) throw error;
+
+    await revalidatePage(`/`);
+    await revalidatePage(`/contact`);
+
+    const { data: projects, error: errorProjects } = await supabase
+      .from('projects')
+      .select("id")
+
+    const { data: categories, error: errorCategories } = await supabase
+      .from('category')
+      .select("slug")
+
+    if (projects?.length) {
+      projects?.forEach( async (project) => {
+        await revalidatePage(`/${project?.id}`);
+      })
+    }
+
+    if (categories?.length) {
+      categories.forEach(async (slugs) => {
+        await revalidatePage(`/${slugs?.slug}`);
+      })
+    }
+
     return data;
   }
 }
