@@ -43,12 +43,16 @@ export async function categoryAction(formData: FormData, isEdit: boolean) {
       })
       .eq('slug', slug).select()
       .select("slug")
-    console.log({data})
+
     if (error) throw error;
 
     await revalidatePage(`/${slug}`);
 
-    data?.forEach( async (slugs) => {
+    const { data: categories, error: errorCategories } = await supabase
+      .from('category')
+      .select("slug")
+
+    categories?.forEach( async (slugs) => {
       await revalidatePage(`/${slugs?.slug}`);
     })
     
@@ -80,7 +84,11 @@ export async function categoryAction(formData: FormData, isEdit: boolean) {
 
     await revalidatePage(`/${slug}`);
 
-    data?.forEach( async (slugs) => {
+    const { data: categories, error: errorCategories } = await supabase
+      .from('category')
+      .select("slug")
+
+    categories?.forEach( async (slugs) => {
       await revalidatePage(`/${slugs?.slug}`);
     })
 

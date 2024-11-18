@@ -108,19 +108,18 @@ export async function createProject(formData: FormData) {
       // })
     console.log({data})
 
-    // const responseRevalidate = await fetch(`https://rifkyprasetia-portfolio.vercel.app/api/revalidate?path=/projects/${id}`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    // })
-
-    // const responseRevalidateJson = await responseRevalidate.json()
-    // console.log({responseRevalidateJson})
-
     if (error) throw error;
 
     await revalidatePage(`/projects/${id}`)
+    await revalidatePage('/')
+
+    dataToAdd?.forEach(async (addCategory) => {
+      await revalidatePage(`/${addCategory}`)
+    })
+    dataToDelete?.forEach(async (deleteCategory) => {
+      await revalidatePage(`/${deleteCategory}`)
+    })
+
     return data;
   } else {
     const { data, error } = await supabase
@@ -155,16 +154,13 @@ export async function createProject(formData: FormData) {
 
     if (error) throw error;
 
-    // const responseRevalidate = await fetch(`https://rifkyprasetia-portfolio.vercel.app/api/revalidate?path=/projects/${data?.[0].id}`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    // })
-
-    // const responseRevalidateJson = await responseRevalidate.json()
-    // console.log({responseRevalidateJson})
     await revalidatePage(`/projects/${data?.[0].id}`)
+    await revalidatePage('/')
+
+    categoryIdsParsed?.forEach(async (slug) => {
+      await revalidatePage(`/${slug}`)
+    })
+
     return data;
   }
 }
@@ -320,6 +316,7 @@ export async function upsertAllProjectPosition(projects: Partial<ProjectDetailTy
       })
       .eq('id', showcase.id)
   })
+
   await revalidatePage(`/`)
 
   // if (error) throw error;
@@ -439,6 +436,13 @@ export async function deleteProject(id: string) {
 
   await revalidatePage(`/`)
   await revalidatePage(`/projects/${id}`)
+  const { data: categories, error: errorCategories } = await supabase
+    .from('category')
+    .select("slug")
+
+  categories?.forEach( async (slugs) => {
+    await revalidatePage(`/${slugs?.slug}`);
+  })
 }
 
 export async function deleteShowcase(id: string) {

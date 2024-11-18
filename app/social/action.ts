@@ -47,6 +47,30 @@ export async function socialAction(formData: FormData) {
       .eq('id', id);
 
     if (error) throw error;
+
+    await revalidatePage(`/`);
+    await revalidatePage(`/contact`);
+
+    const { data: projects, error: errorProjects } = await supabase
+      .from('projects')
+      .select("id")
+
+    const { data: categories, error: errorCategories } = await supabase
+      .from('category')
+      .select("slug")
+
+    if (projects?.length) {
+      projects?.forEach( async (project) => {
+        await revalidatePage(`/${project?.id}`);
+      })
+    }
+
+    if (categories?.length) {
+      categories.forEach(async (slugs) => {
+        await revalidatePage(`/${slugs?.slug}`);
+      })
+    }
+
     return data;
   } else {
     const { data, error } = await supabase
