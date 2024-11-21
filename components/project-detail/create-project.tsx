@@ -24,6 +24,7 @@ import { Button } from "@/components/ui/button"
 import { MultiSelect } from "@/components/ui/multi-select";
 import UploadImage from '../UploadImage';
 import { CategoryDropdownType } from "@/composables/category.types";
+import { Textarea } from "../ui/textarea";
 
 interface InformationProp {
   categories: CategoryDropdownType[] | null
@@ -141,12 +142,12 @@ const CreateProject: React.FC<InformationProp> = ({ categories }) => {
         message: "Project Role is required.",
       });
     }
-    if (!clientName) {
-      errors.push({
-        id: "clientName",
-        message: "Client is required.",
-      });
-    }
+    // if (!clientName) {
+    //   errors.push({
+    //     id: "clientName",
+    //     message: "Client is required.",
+    //   });
+    // }
     if (!month || !year) {
       errors.push({
         id: "dateOfProject",
@@ -310,7 +311,7 @@ const CreateProject: React.FC<InformationProp> = ({ categories }) => {
         </Label>
         <Label className='flex flex-col gap-3'>
           Role
-          <Input
+          <Textarea
             id="role"
             name="role"
             placeholder='Enter your role'

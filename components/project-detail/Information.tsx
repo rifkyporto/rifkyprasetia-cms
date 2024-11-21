@@ -32,6 +32,7 @@ import { UploadButton } from "@/utils/uploadthing";
 import { nanoid } from "nanoid";
 import { Card, CardContent } from "../ui/card";
 import ModalPreviewBannerProject from "../modals/ModalPreviewBannerProject";
+import { Textarea } from "../ui/textarea";
 
 interface InformationProp {
   id: string;
@@ -202,12 +203,12 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
         message: "Project Role is required.",
       });
     }
-    if (!clientName) {
-      errors.push({
-        id: "clientName",
-        message: "Client is required.",
-      });
-    }
+    // if (!clientName) {
+    //   errors.push({
+    //     id: "clientName",
+    //     message: "Client is required.",
+    //   });
+    // }
     if (!month || !year) {
       errors.push({
         id: "dateOfProject",
@@ -447,7 +448,7 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
         </Label>
         <Label className='flex flex-col gap-3'>
           Role
-          <Input
+          <Textarea
             id="role"
             name="role"
             placeholder='Enter your role'
