@@ -184,6 +184,9 @@ const CreateProject: React.FC<InformationProp> = ({ categories }) => {
       })
 
       router.refresh()
+      setTimeout(() => {
+        window.location.replace(`/projects/${id}`)
+      }, 5000)
     } catch (error) {
       console.error('Failed to create project:', error);
       formRef.current?.reset();
@@ -192,12 +195,8 @@ const CreateProject: React.FC<InformationProp> = ({ categories }) => {
         title: "Failed to edit project",
         description: "Please try again or contact the support team.",
       })
-    } finally {
-      setSubmitState('idle');
 
-      setTimeout(() => {
-        window.location.replace(`/projects/${id}`)
-      }, 5000)
+      setSubmitState('idle');
     }
   }
 
