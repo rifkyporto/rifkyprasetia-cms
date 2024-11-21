@@ -185,12 +185,12 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
         message: "Project Name is required.",
       });
     }
-    if (!categoryId) {
-      errors.push({
-        id: "categoryId",
-        message: "Project Category is required.",
-      });
-    }
+    // if (!categoryId) {
+    //   errors.push({
+    //     id: "categoryId",
+    //     message: "Project Category is required.",
+    //   });
+    // }
     if (!categoryIds || !categoryIds.length) {
       errors.push({
         id: "categoryId",
