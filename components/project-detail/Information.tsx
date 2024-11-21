@@ -528,7 +528,7 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
             <div className="flex flex-col gap-2 lg:max-w-2xl">
               <Label key={idx} className='flex flex-col gap-3'>{addition?.label}</Label>
               <div className="w-full flex gap-2">
-                <Input
+                <Textarea
                   id={addition?.label}
                   name={addition?.label}
                   placeholder={`Enter ${addition?.label}`}
