@@ -43,3 +43,4 @@ export default async function Index({ searchParams }: { searchParams: { search?:
     </Layout>
   );
 }
+ 
