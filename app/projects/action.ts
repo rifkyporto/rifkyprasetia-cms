@@ -21,7 +21,7 @@ export async function createProject(formData: FormData) {
 
   const id = formData.get('id') as string;
   const title = formData.get('title') as string;
-  const categoryId = formData.get('categoryId') as string;
+  // const categoryId = formData.get('categoryId') as string;
   const categoryLabel = formData.get('categoryLabel') as string;
   const categoryIds = formData.get('categoryIds') as string;
   const role = formData.get('role') as string;
@@ -41,7 +41,7 @@ export async function createProject(formData: FormData) {
       .from('projects')
       .update({
         title,
-        category_id: categoryId,
+        // category_id: categoryId,
         category_label: categoryLabel,
         role,
         client_name: clientName,
@@ -126,7 +126,7 @@ export async function createProject(formData: FormData) {
       .from('projects')
       .insert({
         title,
-        category_id: categoryId,
+        // category_id: categoryId,
         category_label: categoryLabel,
         role,
         client_name: clientName,
