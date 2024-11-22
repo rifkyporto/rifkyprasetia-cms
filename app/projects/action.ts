@@ -7,6 +7,8 @@ import { ShowcaseType } from "@/composables/showcase.types";
 import { IProjectCategories } from "@/composables/project-categories.type";
 import { ProjectDetailType } from "@/composables/project.types";
 import { handleFileDelete, revalidatePage } from "@/lib/utils-server";
+import { getYoutubeEmbedUrl } from '@/lib/utils';
+
 
 export async function createProject(formData: FormData) {
   const supabase = createClient();
@@ -46,7 +48,7 @@ export async function createProject(formData: FormData) {
         role,
         client_name: clientName,
         date_month_project: `${month} ${year}`,
-        link_teaser: linkTeaser,
+        link_teaser: getYoutubeEmbedUrl(linkTeaser) || linkTeaser,
         user_id: userId,
         cover_image_url: coverImageUrl,
         additional_fields: additionalFields,
@@ -131,7 +133,7 @@ export async function createProject(formData: FormData) {
         role,
         client_name: clientName,
         date_month_project: `${month} ${year}`,
-        link_teaser: linkTeaser,
+        link_teaser: getYoutubeEmbedUrl(linkTeaser) || linkTeaser,
         user_id: userId,
         cover_image_url: coverImageUrl,
         additional_fields: additionalFields,
@@ -208,7 +210,7 @@ export async function showcaseAction(formData: FormData) {
     const { data, error } = await supabase
       .from('showcase_project')
       .update({
-        link,
+        link: getYoutubeEmbedUrl(link) || link,
         is_video: showcaseType === 'video',
         updated_at: new Date()
       })
@@ -238,7 +240,7 @@ export async function showcaseAction(formData: FormData) {
     const { data, error } = await supabase
       .from('showcase_project')
       .insert({
-        link,
+        link: getYoutubeEmbedUrl(link) || link,
         is_video: showcaseType === 'video',
         project_id,
         user_id: userId,

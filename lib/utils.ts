@@ -20,3 +20,13 @@ export function isValidEmail(email: string) {
   const reg = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
   return reg.test(email);
 }
+
+export function getYoutubeEmbedUrl(url: string) {
+  const videoId = url.match(/(?:youtu\.be\/|youtube\.com\/(?:.*v=|.*\/))([a-zA-Z0-9_-]{11})/)?.[1];
+  
+  if (!videoId) {
+      return null;
+  }
+  
+  return `https://youtube.com/embed/${videoId}`;
+}
