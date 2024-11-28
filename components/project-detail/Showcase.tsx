@@ -19,12 +19,14 @@ import {
 import Link from 'next/link';
 import { Button } from '../ui/button';
 import ModalAddEditShowcase from '../modals/ModalAddEditShowcase';
+import ModalAddBulkPhotoShowcase from '../modals/ModalAddBulkPhotoShowcase';
 import { Icon } from '@iconify/react';
 import ModalDeleteShowcase from '../modals/ModalDeleteShowcase';
 
 const Showcase: React.FC<{ id: string }> = ({ id }) => {
   const [showcases, setShowcases] = React.useState<Partial<ShowcaseType>[]>([]);
   const [loadfetch, setLoadfetch] = React.useState<'idle'|'loading'>('idle')
+
   console.log({id})
   React.useEffect(() => {
     setLoadfetch('loading')
@@ -66,6 +68,7 @@ const Showcase: React.FC<{ id: string }> = ({ id }) => {
         </div>
         
         <div className='flex gap-1'>
+          <ModalAddBulkPhotoShowcase project_id={id} />
           <ModalAddEditShowcase project_id={id} type='photo' />
           <ModalAddEditShowcase project_id={id} type='video' />
         </div>

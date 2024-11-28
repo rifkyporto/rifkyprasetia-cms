@@ -90,4 +90,14 @@ export const revalidatePage = async (path: string) => {
 
   const responseRevalidateJson = await responseRevalidate.json()
   console.log({responseRevalidateJson})
+
+  const responseRevalidate2 = await fetch(`https://rifkyprasetia.com/api/revalidate?path=${path}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  })
+
+  const responseRevalidateJson2 = await responseRevalidate2.json()
+  console.log({responseRevalidateJson2})
 }

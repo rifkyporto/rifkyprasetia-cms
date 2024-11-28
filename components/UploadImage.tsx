@@ -23,19 +23,31 @@ const UploadImage: React.FC<UploadImageType> = ({
   const [files, setFiles] = useState<File[]>([])
   // const [fileInput, setFileInput] = useState<HTMLInputElement | null>(null)
 
-  const dragover = (e: Event) => {
+  const dragover = (e: DragEvent<HTMLLabelElement>) => {
     e.preventDefault();
+    e.stopPropagation();
+
     setIsDragging(true)
   };
 
-  const dragleave = () => {
+  const dragleave = (e: DragEvent<HTMLLabelElement>) => {
+    e.preventDefault();
+    e.stopPropagation();
     setIsDragging(false)
   };
 
-  const drop = (e: ChangeEvent<HTMLInputElement>) => {
+  const drop = (e: DragEvent<HTMLLabelElement>) => {
     e.preventDefault();
-    const droppedFiles = e?.target?.files;
-    setFiles([...files, ...droppedFiles])
+    const droppedFiles = e.dataTransfer?.files;
+    const event = {
+      target: {
+        files: droppedFiles
+      }
+    }
+    console.log({droppedFiles})
+    onImageUpload(event)
+    // const droppedFiles = e?.target?.files;
+    // setFiles([...files, ...droppedFiles])
     setIsDragging(false)
     // files.value.push(...droppedFiles);
   };
