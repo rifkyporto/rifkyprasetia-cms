@@ -116,6 +116,7 @@ const CreateProject: React.FC<InformationProp> = ({ categories }) => {
     const role = formData.get('role') as string;
     const clientName = formData.get('clientName') as string;
     const linkTeaser = formData.get('linkTeaser') as string;
+    const is_video_istrailer = formData.get('is_video_istrailer');
 
     if (!coverProject) {
       errors.push({
@@ -384,7 +385,7 @@ const CreateProject: React.FC<InformationProp> = ({ categories }) => {
             </small>
           )}
         </Label>
-        <Label className='flex flex-col gap-3'>
+        <Label className='flex flex-col gap-3' htmlFor='linkTeaser'>
           Link to Watch
           <Input
             id="linkTeaser"
@@ -393,6 +394,10 @@ const CreateProject: React.FC<InformationProp> = ({ categories }) => {
             className='lg:max-w-2xl'
             // defaultValue={project?.link_teaser}
           />
+          <Label className='flex gap-2 items-center' htmlFor='is_video_istrailer'>
+            <input id='is_video_istrailer' name='is_video_istrailer' type='checkbox'/>
+            <p>Is this a trailer?</p>
+          </Label>
         </Label>
       </form>
     </div>

@@ -520,6 +520,10 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
             defaultValue={project?.link_teaser}
             onChange={() => !isEdit && setIsEdit(true)}
           />
+          <Label className='flex gap-2 items-center' htmlFor='is_video_istrailer'>
+            <input id='is_video_istrailer' name='is_video_istrailer' type='checkbox' defaultChecked={project?.is_video_istrailer} onChange={() => !isEdit && setIsEdit(true)} />
+            <p>Is this a trailer?</p>
+          </Label>
         </Label>
         <hr />
         <h2 className="text-xl">Additional Field</h2>

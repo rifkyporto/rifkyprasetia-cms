@@ -31,6 +31,7 @@ export async function createProject(formData: FormData) {
   const month = formData.get('month') as string;
   const year = formData.get('year') as string;
   const linkTeaser = formData.get('linkTeaser') as string;
+  const is_video_istrailer = formData.get('is_video_istrailer');
   const coverImageUrl = formData.get('coverImageUrl') as string;
   const categoryIdsParsed: string[] = JSON.parse(categoryIds);
 
@@ -49,6 +50,7 @@ export async function createProject(formData: FormData) {
         client_name: clientName,
         date_month_project: `${month} ${year}`,
         link_teaser: getYoutubeEmbedUrl(linkTeaser) || linkTeaser,
+        is_video_istrailer: Boolean(is_video_istrailer === "on") || false,
         user_id: userId,
         cover_image_url: coverImageUrl,
         additional_fields: additionalFields,
@@ -134,6 +136,7 @@ export async function createProject(formData: FormData) {
         client_name: clientName,
         date_month_project: `${month} ${year}`,
         link_teaser: getYoutubeEmbedUrl(linkTeaser) || linkTeaser,
+        is_video_istrailer: Boolean(is_video_istrailer === "on") || false,
         user_id: userId,
         cover_image_url: coverImageUrl,
         additional_fields: additionalFields,

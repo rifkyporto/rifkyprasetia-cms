@@ -9,6 +9,7 @@ export type ProjectDetailType = {
   client_name: string;
   date_month_project: string;
   link_teaser: string;
+  is_video_istrailer: boolean;
   cover_image_url: string;
   banner_url: string;
   position: number;
