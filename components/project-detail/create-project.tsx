@@ -40,6 +40,8 @@ const CreateProject: React.FC<InformationProp> = ({ categories }) => {
     }
   })
 
+  const [slugGenerate, setSlugGenerate] = useState<string>('');
+  const [unlinkSlug, setUnlinkSlug] = useState<boolean>(false);
   const [month, setMonth] = useState<string>('');
   const [year, setYear] = useState<string>('');
   const [categoryIds, setCategoryIds] = useState<string[]>([]);
@@ -117,6 +119,26 @@ const CreateProject: React.FC<InformationProp> = ({ categories }) => {
     const clientName = formData.get('clientName') as string;
     const linkTeaser = formData.get('linkTeaser') as string;
     const is_video_istrailer = formData.get('is_video_istrailer');
+    const slug = formData.get('slug') as string;
+
+    if (!slug) {
+      errors.push({
+        id: "slug",
+        message: "Slug is required.",
+      });
+    } else {
+      const { data: checkSlug } = await supabase
+        .from('projects')
+        .select("id")
+        .eq('slug', slug)
+
+      if (checkSlug?.length) {
+        errors.push({
+          id: "slug",
+          message: "Slug is already taken. You can create another slug for this project.",
+        });
+      }
+    }
 
     if (!coverProject) {
       errors.push({
@@ -187,6 +209,8 @@ const CreateProject: React.FC<InformationProp> = ({ categories }) => {
       setTimeout(() => {
         window.location.replace(`/projects/${id}`)
       }, 5000)
+
+      setSubmitState('idle');
     } catch (error) {
       console.error('Failed to create project:', error);
       formRef.current?.reset();
@@ -199,6 +223,18 @@ const CreateProject: React.FC<InformationProp> = ({ categories }) => {
       setSubmitState('idle');
     }
   }
+
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    let value = e.target.value;
+
+    value = value
+      .toLowerCase()
+      .replace(/ /g, '-')          // Replace spaces with hyphens
+      .replace(/[^a-z0-9-]/g, ''); // Remove any character that's not a lowercase letter, number, or a hyphen
+
+    // Update the state with the modified value
+    setSlugGenerate(value);
+  };
 
   return (
     <div className='flex flex-col w-full gap-5'>
@@ -267,11 +303,35 @@ const CreateProject: React.FC<InformationProp> = ({ categories }) => {
             name='title'
             placeholder='Enter project name'
             className='lg:max-w-2xl'
+            onChange={(e) => !unlinkSlug && handleInputChange(e)}
             // defaultValue={project?.title}
           />
           {errorFeedback?.find((err) => err.id === "title") && (
             <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
               {errorFeedback?.find((err) => err.id === "title")?.message}
+            </small>
+          )}
+        </Label>
+        <Label className='flex flex-col gap-3'>
+          Project Slug
+          <div className='lg:max-w-2xl flex gap-1'>
+            <Input
+              id='slug'
+              name='slug'
+              placeholder='Enter project slug (url link)'
+              className='w-full'
+              value={slugGenerate}
+              onChange={handleInputChange}
+              // defaultValue={project?.title}
+            />
+            <Button type='button' variant={'secondary'} onClick={() => setUnlinkSlug(true)} disabled={unlinkSlug}>Unlink From Project Name</Button>
+          </div>
+          <small className="">
+            It will be auto-generated if this field is empty
+          </small>
+          {errorFeedback?.find((err) => err.id === "slug") && (
+            <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              {errorFeedback?.find((err) => err.id === "slug")?.message}
             </small>
           )}
         </Label>

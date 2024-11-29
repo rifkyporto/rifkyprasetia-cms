@@ -51,6 +51,9 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
     }
    })
 
+  const [slugGenerate, setSlugGenerate] = useState<string>('');
+  const [unlinkSlug, setUnlinkSlug] = useState<boolean>(false);
+
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [month, setMonth] = useState<string>(project?.date_month_project?.split(" ")?.[0] || '');
   const [year, setYear] = useState<string>(project?.date_month_project?.split(" ")?.[1] || '');
@@ -172,6 +175,26 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
     const role = formData.get('role') as string;
     const clientName = formData.get('clientName') as string;
     const linkTeaser = formData.get('linkTeaser') as string;
+    const slug = formData.get('slug') as string;
+
+    if (!slug) {
+      errors.push({
+        id: "slug",
+        message: "Slug is required.",
+      });
+    } else {
+      const { data: checkSlug } = await supabase
+        .from('projects')
+        .select("id")
+        .eq('slug', slug)
+
+      if (checkSlug?.length) {
+        errors.push({
+          id: "slug",
+          message: "Slug is already taken. You can create another slug for this project.",
+        });
+      }
+    }
 
     if (!coverProject) {
       errors.push({
@@ -259,7 +282,20 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
       setIsEdit(false);
     }
   }
-  console.log({additionalFields})
+  
+  const handleInputChange = (e: ChangeEvent<HTMLInputElement>) => {
+    !isEdit && setIsEdit(true)
+    let value = e.target.value;
+
+    value = value
+      .toLowerCase()
+      .replace(/ /g, '-')          // Replace spaces with hyphens
+      .replace(/[^a-z0-9-]/g, ''); // Remove any character that's not a lowercase letter, number, or a hyphen
+
+    // Update the state with the modified value
+    setSlugGenerate(value);
+  };
+
   return (
     <div className='flex flex-col w-full gap-5'>
       <form action={onSubmit} ref={formRef} className='flex flex-col w-full gap-5'>
@@ -414,6 +450,28 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
             defaultValue={project?.title}
             onChange={() => !isEdit && setIsEdit(true)}
           />
+        </Label>
+        <Label className='flex flex-col gap-3'>
+          Project Slug
+          <div className='lg:max-w-2xl flex gap-1'>
+            <Input
+              id='slug'
+              name='slug'
+              placeholder='Enter project slug (url link)'
+              className='w-full'
+              value={slugGenerate}
+              onChange={handleInputChange}
+              // defaultValue={project?.title}
+            />
+          </div>
+          <small className="">
+            It will be auto-generated if this field is empty
+          </small>
+          {errorFeedback?.find((err) => err.id === "slug") && (
+            <small className="text-red-500 leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+              {errorFeedback?.find((err) => err.id === "slug")?.message}
+            </small>
+          )}
         </Label>
         <Label className='flex flex-col gap-3'>
           Project Type
