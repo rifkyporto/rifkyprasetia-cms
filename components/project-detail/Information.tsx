@@ -51,8 +51,7 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
     }
    })
 
-  const [slugGenerate, setSlugGenerate] = useState<string>('');
-  const [unlinkSlug, setUnlinkSlug] = useState<boolean>(false);
+  const [slugGenerate, setSlugGenerate] = useState<string>(project?.slug || '');
 
   const [isEdit, setIsEdit] = useState<boolean>(false);
   const [month, setMonth] = useState<string>(project?.date_month_project?.split(" ")?.[0] || '');
