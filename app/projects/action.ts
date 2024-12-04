@@ -116,7 +116,7 @@ export async function createProject(formData: FormData) {
 
     if (error) throw error;
 
-    await revalidatePage(`/projects/${id}`)
+    await revalidatePage(`/projects/${slug}`)
     await revalidatePage('/')
 
     dataToAdd?.forEach(async (addCategory) => {
@@ -162,7 +162,7 @@ export async function createProject(formData: FormData) {
 
     if (error) throw error;
 
-    await revalidatePage(`/projects/${data?.[0].id}`)
+    await revalidatePage(`/projects/${data?.[0].slug}`)
     await revalidatePage('/')
 
     categoryIdsParsed?.forEach(async (slug) => {
@@ -329,7 +329,13 @@ export async function upsertShowcasePosition(showcases: Partial<ShowcaseType>[])
     project_id = data?.[0].project_id
   })
 
-  project_id && await revalidatePage(`/projects/${project_id}`)
+  const { data: dataProject, error } = await supabase
+    .from('projects')
+    .select(`id, slug`)
+    .eq("id", project_id)
+    .single()
+
+  project_id && await revalidatePage(`/projects/${dataProject?.slug}`)
   // if (error) throw error;
   // return data
 }
@@ -476,7 +482,7 @@ export async function deleteProject(id: string) {
     .eq('id', id)
 
   await revalidatePage(`/`)
-  await revalidatePage(`/projects/${id}`)
+  await revalidatePage(`/projects/${data?.[0]?.slug}`)
   const { data: categories, error: errorCategories } = await supabase
     .from('category')
     .select("slug")
@@ -514,7 +520,13 @@ export async function deleteShowcase(id: string) {
     .delete()
     .eq('id', id)
 
-  await revalidatePage(`/projects/${dataShowcase?.[0]?.project_id}`)
+  const { data: dataProject, error } = await supabase
+    .from('projects')
+    .select(`id, slug`)
+    .eq("id", dataShowcase?.[0]?.project_id)
+    .single()
+
+  await revalidatePage(`/projects/${dataProject?.slug}`)
 }
 
 export async function deleteImageUploadthing(id: string) {
