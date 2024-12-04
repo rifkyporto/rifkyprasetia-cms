@@ -208,9 +208,11 @@ export async function showcaseAction(formData: FormData) {
 
   const id = formData.get('id') as string;
   const link = formData.get('link') as string;
+  const linkBulk = formData.get('link_bulk') as string;
   const showcaseType = formData.get('showcaseType') as string;
   const project_id = formData.get('project_id') as string;
 
+  const link_bulk = linkBulk ? JSON.parse(linkBulk) : null;
   console.log({project_id})
   if (id) {
     const { data, error } = await supabase
@@ -237,6 +239,28 @@ export async function showcaseAction(formData: FormData) {
     await revalidatePage(`/projects/${project_id}`)
 
     return data;
+  } else if (link_bulk && link_bulk?.length) {
+    const { count } = await supabase
+      .from('showcase_project')
+      .select('id', { count: 'exact' })
+      .eq('project_id', project_id);
+
+    await Promise.all(
+      link_bulk.map(async (linkimg: string, index: number) => {
+
+        const { data, error } = await supabase
+          .from('showcase_project')
+          .insert({
+            link: getYoutubeEmbedUrl(linkimg) || linkimg,
+            is_video: showcaseType === 'video',
+            project_id,
+            user_id: userId,
+            position: (count || 0) + index
+          });
+
+        if (error) throw error;
+      })
+    )
   } else {
     const { count } = await supabase
       .from('showcase_project')

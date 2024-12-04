@@ -120,27 +120,30 @@ const ModalAddBulkPhotoShowcase: React.FC<ModalAddEditSocialType> = ({ project_i
       setImageUploadState('idle')
     }
   };
-  console.log({coverProject})
-  const onSubmit = async (formData: FormData, linkImage?: string) => {
-    formData.set('link', linkImage!)
-    formData.set('showcaseType', 'photo')
-    formData.set('project_id', project_id)
+  // console.log({coverProject})
+  // const onSubmit = async (formData: FormData, linkImage?: string) => {
+  //   console.log({linkImage})
+  //   formData.set('link', linkImage!)
+  //   formData.set('showcaseType', 'photo')
+  //   formData.set('project_id', project_id)
 
-    setErrorFeedback([]);
+  //   setErrorFeedback([]);
 
-    await showcaseAction(formData);
-  }
+  //   await showcaseAction(formData);
+  // }
 
   const onSubmitForm = async (formData: FormData) => {
     if (!coverProject?.length) return
     try {
       setLoadingState('loading');
 
-      await Promise.all(
-        coverProject?.map( async (cover) => {
-          await onSubmit(formData, cover)
-        })
-      )
+      const linkBulk = JSON.stringify(coverProject);
+
+      formData.set('link_bulk', linkBulk!)
+      formData.set('showcaseType', 'photo')
+      formData.set('project_id', project_id)
+
+      await showcaseAction(formData);
 
       toast({
         title: "Success insert bulk showcase project",
