@@ -213,6 +213,13 @@ export async function showcaseAction(formData: FormData) {
   const project_id = formData.get('project_id') as string;
 
   const link_bulk = linkBulk ? JSON.parse(linkBulk) : null;
+
+  const { data: dataProject, error } = await supabase
+    .from('projects')
+    .select(`id, slug`)
+    .eq("id", id)
+    .single()
+
   console.log({project_id})
   if (id) {
     const { data, error } = await supabase
@@ -236,7 +243,7 @@ export async function showcaseAction(formData: FormData) {
     const responseRevalidateJson = await responseRevalidate.json()
     console.log({responseRevalidateJson})
 
-    await revalidatePage(`/projects/${project_id}`)
+    await revalidatePage(`/projects/${dataProject?.slug}`)
 
     return data;
   } else if (link_bulk && link_bulk?.length) {
@@ -261,6 +268,8 @@ export async function showcaseAction(formData: FormData) {
         if (error) throw error;
       })
     )
+    await revalidatePage(`/projects/${dataProject?.slug}`)
+    return
   } else {
     const { count } = await supabase
       .from('showcase_project')
@@ -288,7 +297,7 @@ export async function showcaseAction(formData: FormData) {
 
     // const responseRevalidateJson = await responseRevalidate.json()
     // console.log({responseRevalidateJson})
-    await revalidatePage(`/projects/${project_id}`)
+    await revalidatePage(`/projects/${dataProject?.slug}`)
     return data;
   }
 }
