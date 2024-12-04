@@ -217,7 +217,7 @@ export async function showcaseAction(formData: FormData) {
   const { data: dataProject, error } = await supabase
     .from('projects')
     .select(`id, slug`)
-    .eq("id", id)
+    .eq("id", project_id)
     .single()
 
   console.log({project_id})
