@@ -186,8 +186,9 @@ const Information: React.FC<InformationProp> = ({ id, project, categories }) => 
         .from('projects')
         .select("id")
         .eq('slug', slug)
+        .single()
 
-      if (checkSlug?.length) {
+      if (checkSlug && checkSlug?.id !== id) {
         errors.push({
           id: "slug",
           message: "Slug is already taken. You can create another slug for this project.",
