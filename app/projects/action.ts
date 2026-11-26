@@ -340,6 +340,18 @@ export async function upsertShowcasePosition(showcases: Partial<ShowcaseType>[])
   // return data
 }
 
+export async function revalidateContactPage() {
+  const supabase = createClient();
+
+  const { data: { session } } = await supabase.auth.getSession();
+
+  if (!session) {
+    throw new Error('Not authenticated');
+  }
+
+  await revalidatePage(`/contact`)
+}
+
 export async function upsertAllProjectPosition(projects: Partial<ProjectDetailType>[]) {
   const supabase = createClient();
 

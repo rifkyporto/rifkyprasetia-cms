@@ -12,7 +12,7 @@ import { Social } from '@/composables/social.types';
 import { ErrorInputTag } from '@/composables/validation.types';
 import { capitalizeFirstLetter, isValidEmail } from '@/lib/utils';
 import { UploadButton } from '@/utils/uploadthing';
-import { deleteImageUploadthing } from '@/app/projects/action';
+import { deleteImageUploadthing, revalidateContactPage } from '@/app/projects/action';
 import {
   Select,
   SelectContent,
@@ -118,6 +118,8 @@ const ProfileClient = ({ profile, socials }: { profile: IProfile, socials: Socia
         toast({
           title: "Success edit profile data",
         })
+
+        await revalidateContactPage()
       }
 
       const selectedSocialMedia = [...selectedSocial];
